@@ -1,0 +1,15 @@
+# Editor stuff
+*.swp
+*.bak
+
+# Binary resources, these will be tracked at some point but not now.
+*.res
+*.tres
+*.meshlib
+*.mesh
+*.dae
+*.png
+*.jpg
+*.material
+*.import
+.import/

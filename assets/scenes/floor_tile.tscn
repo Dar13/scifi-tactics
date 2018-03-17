@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://assets/scripts/floor_tile.gd" type="Script" id=1]
+[ext_resource path="res://assets/models/map/Cube_001.mesh" type="ArrayMesh" id=2]
+[ext_resource path="res://assets/models/map/Material.material" type="Material" id=3]
+[ext_resource path="res://assets/scripts/floor_tile_col.gd" type="Script" id=4]
+
+[sub_resource type="BoxShape" id=1]
+
+extents = Vector3( 1, 1, 1 )
+
+[node name="root" type="Spatial"]
+
+script = ExtResource( 1 )
+
+[node name="mesh" type="MeshInstance" parent="." index="0"]
+
+layers = 1
+material_override = null
+cast_shadow = 1
+extra_cull_margin = 0.0
+use_in_baked_light = false
+lod_min_distance = 0.0
+lod_min_hysteresis = 0.0
+lod_max_distance = 0.0
+lod_max_hysteresis = 0.0
+mesh = ExtResource( 2 )
+skeleton = NodePath("..")
+material/0 = ExtResource( 3 )
+_sections_unfolded = [ "Geometry", "material" ]
+
+[node name="mesh_body" type="StaticBody" parent="mesh" index="0"]
+
+input_ray_pickable = true
+input_capture_on_drag = false
+collision_layer = 1
+collision_mask = 1
+friction = 1.0
+bounce = 0.0
+constant_linear_velocity = Vector3( 0, 0, 0 )
+constant_angular_velocity = Vector3( 0, 0, 0 )
+script = ExtResource( 4 )
+
+[node name="mesh_shape" type="CollisionShape" parent="mesh/mesh_body" index="0"]
+
+shape = SubResource( 1 )
+disabled = false
+
+
