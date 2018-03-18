@@ -40,10 +40,6 @@ func center_around_point(point):
 #	# Update game logic here.
 #	pass
 
-
-func orbit_3d(angle, origin, current):
-	pass
-
 func _input(event):
 	if event is InputEventMouseMotion:
 		if Input.is_action_pressed("middle_click"):

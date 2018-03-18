@@ -5,13 +5,15 @@ signal cancel
 var character_scene = load("res://assets/models/characters/basic_character.tscn")
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 var character_state = load("res://assets/scripts/characters/character_state.gd")
+var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 
 onready var cancel_btn = get_node("../cancel_button")
 
 var characters = {}
 var selected_character = null
 var character_move_tiles = []
-var selected_original_pos = Vector3(0,0,0)
+var selected_char_original_pos = Vector3(0,0,0)
+var selected_char_menu = null
 
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../map_root")
@@ -23,11 +25,10 @@ var click_target = Vector3(0, 0, 0)
 func add_character(position):
 	print("Adding character at %s" % [ position ])
 	var character = character_scene.instance()
-	get_tree().get_root().add_child(character)
+	get_tree().get_root().call_deferred("add_child", character)
 	character.set_position(position)
 	character.map = map
 	character.show()
-	character.connect("display_move_tiles", self, "display_char_move_tiles")
 	character.connect("update_state", self, "update_character_state")
 
 	characters[character.get_instance_id()] = character
@@ -42,11 +43,19 @@ func _ready():
 	# Max movement range is 5 for now(lol kinda), so make 10*10 tiles (i.e. [(-5, 0, -5) -> (5, 0, 5)])
 	for i in range(10 * 10):
 		character_move_tiles.append(move_tile_scene.instance())
-
+		
 		get_tree().get_root().call_deferred("add_child", character_move_tiles[i])
 		character_move_tiles[i].hide()
 	
 	cancel_btn.connect("cancel", self, "handle_cancel")
+	
+	selected_char_menu = character_action_menu.instance()
+	selected_char_menu.visible = false
+	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_cancel")
+	get_tree().get_root().call_deferred("add_child", selected_char_menu)
+	
+	# Super temporary
+	add_character(Vector3(0.0, 2.0, 0.0))
 	
 	return
 
@@ -76,11 +85,11 @@ func handle_click(object):
 	if object != null:
 		var tile_idx = character_move_tiles.find(object.get_parent())
 		# Did we click on a displayed move tile?
-		if tile_idx != -1:
+		if tile_idx != -1 && object.get_parent().visible:
 			var tile_pos = character_move_tiles[tile_idx].translation
 			tile_pos.y = round(tile_pos.y) 			# Should round down
 			var tile_map_pos = map.get_map_coords(tile_pos)
-			selected_original_pos = selected_character.translation
+			selected_char_original_pos = selected_character.translation
 			selected_character.move(tile_map_pos)
 			camera.center_around_point(tile_pos)
 		# Did we click on a character?
@@ -103,16 +112,17 @@ func handle_cancel():
 	if selected_character:
 		match selected_character.curr_phase:
 			character_state.Phases.Action:
-				selected_character.set_position(selected_original_pos)
-				camera.center_around_point(selected_original_pos)
+				selected_character.set_position(selected_char_original_pos)
+				camera.center_around_point(selected_char_original_pos)
 				update_character_state(selected_character, character_state.Phases.Selected)
 	pass
 
 func update_character_state(character, new_state):
 	if character == null:
 		return
-	
-	#print("received update_state: %s : %s" % [character, new_state])
+
+	if selected_char_menu.visible:
+		selected_char_menu.visible = false
 	
 	match new_state:
 		character_state.Phases.Unselected:
@@ -123,6 +133,18 @@ func update_character_state(character, new_state):
 		
 		character_state.Phases.MoveStart:
 			hide_char_move_tiles()
+		
+		character_state.Phases.Action:
+			var menu_pos = camera.unproject_position(character.global_transform.origin)
+			menu_pos.x -= selected_char_menu.get_global_rect().size.x / 2
+			menu_pos.y -= 100
+			selected_char_menu.rect_global_position = menu_pos
+			selected_char_menu.visible = true
+			
+		character_state.Phases.Done:
+			character.deselect()
+			selected_character = null
+			selected_char_original_pos = null
 	
 	character.curr_phase = new_state
 	return

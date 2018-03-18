@@ -6,8 +6,6 @@ extends KinematicBody
 
 var state = load("res://assets/scripts/characters/character_state.gd")
 
-signal display_move_tiles(character, distance)
-
 var curr_phase = state.Phases.Unselected
 signal update_state(character, new_state)
 
