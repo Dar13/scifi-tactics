@@ -25,8 +25,10 @@ func _ready():
 	# Called every time the node is added to the scene.
 	# Initialization here
 	
+	character_material = SpatialMaterial.new()
+	character_material.albedo_color = Color(1.0, 0.0, 0.0, 1.0)
 	if character_mesh != null && character_mesh is MeshInstance:
-		character_material = character_mesh.get_surface_material(0)
+		character_mesh.set_surface_material(0, character_material)
 	
 	pass
 
@@ -56,7 +58,7 @@ func _process(delta):
 
 func set_position(position):
 	self.set_identity()
-	self.global_translate(position)
+	self.translate(position)
 
 func set_movement_space(cell_list):
 	movement_cell_list = cell_list

@@ -1,13 +1,9 @@
 extends Node
 
-signal cancel
-
 var character_scene = load("res://assets/models/characters/basic_character.tscn")
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 var character_state = load("res://assets/scripts/characters/character_state.gd")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
-
-onready var cancel_btn = get_node("../cancel_button")
 
 var characters = {}
 var selected_character = null
@@ -16,24 +12,28 @@ var selected_char_original_pos = Vector3(0,0,0)
 var selected_char_menu = null
 
 onready var camera = get_viewport().get_camera()
-onready var map = get_node("../map_root")
+onready var map = get_node("../../map_root")
 
 var perform_raycast = false
 var click_origin = Vector3(0, 0, 0)
 var click_target = Vector3(0, 0, 0)
 
-func add_character(position):
-	print("Adding character at %s" % [ position ])
-	var character = character_scene.instance()
-	get_tree().get_root().call_deferred("add_child", character)
-	character.set_position(position)
-	character.map = map
-	character.show()
-	character.connect("update_state", self, "update_character_state")
+func prepare_for_turn(new_characters):
+	characters = new_characters
+	for c in characters.values():
+		c.deselect()
 
-	characters[character.get_instance_id()] = character
-
-	return
+#func add_character(character, position):
+#	print("Adding character at %s" % [ position ])
+#	get_tree().get_root().call_deferred("add_child", character)
+#	character.set_position(position)
+#	character.map = map
+#	character.show()
+#	character.connect("update_state", self, "update_character_state")
+#
+#	characters[character.get_instance_id()] = character
+#
+#	return
 
 # Called every time the node is added to the scene.
 func _ready():
@@ -47,15 +47,11 @@ func _ready():
 		get_tree().get_root().call_deferred("add_child", character_move_tiles[i])
 		character_move_tiles[i].hide()
 	
-	cancel_btn.connect("cancel", self, "handle_cancel")
-	
 	selected_char_menu = character_action_menu.instance()
 	selected_char_menu.visible = false
-	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_cancel")
-	get_tree().get_root().call_deferred("add_child", selected_char_menu)
-	
-	# Super temporary
-	add_character(Vector3(0.0, 2.0, 0.0))
+	selected_char_menu.get_cancel_btn().connect("pressed", self, "handle_cancel")
+	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_standby")
+	call_deferred("add_child", selected_char_menu)
 	
 	return
 
@@ -73,7 +69,7 @@ func _process(delta):
 
 	pass
 
-func _input(event):
+func _unhandled_input(event):
 	if event.is_action("left_click") && event.pressed == false:
 		click_origin = camera.project_ray_origin(event.position)
 		click_target = click_origin + camera.project_ray_normal(event.position) * 5000
@@ -83,9 +79,10 @@ func _input(event):
 
 func handle_click(object):
 	if object != null:
-		var tile_idx = character_move_tiles.find(object.get_parent())
+		var parent = object.get_parent()
+		var tile_idx = character_move_tiles.find(parent)
 		# Did we click on a displayed move tile?
-		if tile_idx != -1 && object.get_parent().visible:
+		if tile_idx != -1 && parent.visible:
 			var tile_pos = character_move_tiles[tile_idx].translation
 			tile_pos.y = round(tile_pos.y) 			# Should round down
 			var tile_map_pos = map.get_map_coords(tile_pos)
@@ -116,6 +113,10 @@ func handle_cancel():
 				camera.center_around_point(selected_char_original_pos)
 				update_character_state(selected_character, character_state.Phases.Selected)
 	pass
+
+func handle_standby():
+	if selected_character:
+		update_character_state(selected_character, character_state.Phases.Done)
 
 func update_character_state(character, new_state):
 	if character == null:
@@ -170,10 +171,7 @@ func display_char_move_tiles(object, distance):
 		var tile_world_pos = map.get_world_coords(tile.map_position)
 		tile_world_pos.y += 1.1
 		
-		character_move_tiles[idx].set_identity()
-		character_move_tiles[idx].global_translate(tile_world_pos)
-		character_move_tiles[idx].set_color(Color(0.0, 0.0, 1.0, 1.0))
-		character_move_tiles[idx].show()
+		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 1.0))
 		idx += 1
 	
 	character.set_movement_space(move_tiles)

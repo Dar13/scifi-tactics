@@ -11,3 +11,6 @@ func get_item_btn():
 
 func get_standby_btn():
 	return get_node("standby")
+
+func get_cancel_btn():
+	return get_node("cancel")

@@ -22,6 +22,12 @@ func _ready():
 #	# Update game logic here.
 #	pass
 
+func display(new_pos, color):
+	set_identity()
+	global_translate(new_pos)
+	set_color(color)
+	show()
+
 func set_color(new_value):
 	if material is SpatialMaterial:
 		material.albedo_color = new_value
