@@ -45,7 +45,6 @@ func evaluate_battlefield():
 		obstacles.append(map.get_map_coords(char_pos))
 
 	map.obstacles = obstacles
-		
 	return
 
 #func _process(delta):

@@ -92,6 +92,7 @@ func handle_click(object):
 			
 			selected_character = clicked_char
 			selected_character.select()
+			camera.center_around_point(selected_character.translation)
 
 	pass
 
@@ -118,26 +119,26 @@ func update_character_state(character, new_state):
 	match new_state:
 		character_state.Phases.Unselected:
 			hide_char_move_tiles()
-			
+
 		character_state.Phases.Selected:
 			display_char_move_tiles(character, character.movement_range)
-		
+
 		character_state.Phases.MoveStart:
 			hide_char_move_tiles()
-		
+
 		character_state.Phases.Action:
 			var menu_pos = camera.unproject_position(character.global_transform.origin)
 			menu_pos.x -= selected_char_menu.get_global_rect().size.x / 2
 			menu_pos.y -= 100
 			selected_char_menu.rect_global_position = menu_pos
 			selected_char_menu.visible = true
-			
+
 		character_state.Phases.Done:
 			emit_signal("battlefield_updated")
 			character.deselect()
 			selected_character = null
 			selected_char_original_pos = null
-	
+
 	character.curr_phase = new_state
 	return
 
