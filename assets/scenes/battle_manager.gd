@@ -12,6 +12,7 @@ var enemy_team = {}
 
 func _ready():
 	add_child(character_mgr)
+	character_mgr.connect("battlefield_updated", self, "evaluate_battlefield")
 	
 	# Initialize the battle scene
 	# For now this means, spawn the one team
@@ -30,7 +31,21 @@ func _ready():
 
 	
 	# Player team starts the battle
+	evaluate_battlefield()
 	character_mgr.prepare_for_turn(player_team)
+	return
+
+# Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
+func evaluate_battlefield():
+	var obstacles = []
+	
+	for c in player_team.values():
+		var char_pos = c.translation
+		char_pos.y -= 2
+		obstacles.append(map.get_map_coords(char_pos))
+
+	map.obstacles = obstacles
+		
 	return
 
 #func _process(delta):

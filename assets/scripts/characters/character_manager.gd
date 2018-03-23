@@ -1,5 +1,7 @@
 extends Node
 
+signal battlefield_updated
+
 var character_scene = load("res://assets/models/characters/basic_character.tscn")
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 var character_state = load("res://assets/scripts/characters/character_state.gd")
@@ -22,18 +24,6 @@ func prepare_for_turn(new_characters):
 	characters = new_characters
 	for c in characters.values():
 		c.deselect()
-
-#func add_character(character, position):
-#	print("Adding character at %s" % [ position ])
-#	get_tree().get_root().call_deferred("add_child", character)
-#	character.set_position(position)
-#	character.map = map
-#	character.show()
-#	character.connect("update_state", self, "update_character_state")
-#
-#	characters[character.get_instance_id()] = character
-#
-#	return
 
 # Called every time the node is added to the scene.
 func _ready():
@@ -143,6 +133,7 @@ func update_character_state(character, new_state):
 			selected_char_menu.visible = true
 			
 		character_state.Phases.Done:
+			emit_signal("battlefield_updated")
 			character.deselect()
 			selected_character = null
 			selected_char_original_pos = null

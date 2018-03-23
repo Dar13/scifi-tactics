@@ -5,6 +5,8 @@ var grid_graph = []
 var grid_min = Vector3(100, 100, 100)
 var grid_max = Vector3(-100, -100, -100)
 
+var obstacles = []
+
 const grid_directions = [Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, 0, -1)]
 
 class MapCell:
@@ -56,7 +58,7 @@ func get_neighbors(map_pos, max_vertical):
 				break;
 		
 		var vert_dist = map_pos.y - tmp.y
-		if vert_dist <= max_vertical && is_pos_in_grid(tmp):
+		if vert_dist <= max_vertical && is_pos_in_grid(tmp) && obstacles.find(tmp) == -1:
 				neighbors.append(MapCell.new(tmp, null, 0))
 	
 	return neighbors
