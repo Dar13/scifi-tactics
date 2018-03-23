@@ -83,6 +83,8 @@ func handle_click(object):
 			var tile_map_pos = map.get_map_coords(tile_pos)
 			selected_char_original_pos = selected_character.translation
 			selected_character.move(tile_map_pos)
+			
+			tile_pos.y += selected_character.character_mesh.get_aabb().size.y / 2
 			camera.center_around_point(tile_pos)
 		# Did we click on a character?
 		elif characters.has(object.get_instance_id()) == true:
@@ -95,9 +97,10 @@ func handle_click(object):
 			elif selected_character == clicked_char:
 				return
 			
-			selected_character = clicked_char
-			selected_character.select()
-			camera.center_around_point(selected_character.translation)
+			if clicked_char.curr_phase != character_state.Phases.Done:
+				selected_character = clicked_char
+				selected_character.select()
+				camera.center_around_point(selected_character.translation)
 
 	pass
 
@@ -113,6 +116,7 @@ func restore_original():
 	if selected_character && selected_char_original_pos:
 		selected_character.set_position(selected_char_original_pos)
 		camera.center_around_point(selected_char_original_pos)
+		selected_char_original_pos = null
 
 func handle_standby():
 	if selected_character:
@@ -128,7 +132,8 @@ func update_character_state(character, new_state):
 	match new_state:
 		character_state.Phases.Unselected:
 			hide_char_move_tiles()
-			restore_original()
+			if character.curr_phase != character_state.Phases.Done:
+				restore_original()
 
 		character_state.Phases.Selected:
 			display_char_move_tiles(character, character.movement_range)
@@ -145,9 +150,11 @@ func update_character_state(character, new_state):
 
 		character_state.Phases.Done:
 			emit_signal("battlefield_updated")
-			character.deselect()
+			# Pre-emptively set the state for this case
+			character.curr_phase = new_state
 			selected_character = null
 			selected_char_original_pos = null
+			character.deselect()
 
 	character.curr_phase = new_state
 
