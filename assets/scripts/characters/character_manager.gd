@@ -1,6 +1,7 @@
 extends Node
 
 signal battlefield_updated
+signal turn_done
 
 var character_scene = load("res://assets/models/characters/basic_character.tscn")
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
@@ -24,6 +25,10 @@ func prepare_for_turn(new_characters):
 	characters = new_characters
 	for c in characters.values():
 		c.deselect()
+
+func finalize_turn():
+	print("turn done")
+	emit_signal("turn_done")
 
 # Called every time the node is added to the scene.
 func _ready():
@@ -100,10 +105,14 @@ func handle_cancel():
 	if selected_character:
 		match selected_character.curr_phase:
 			character_state.Phases.Action:
-				selected_character.set_position(selected_char_original_pos)
-				camera.center_around_point(selected_char_original_pos)
+				restore_original()
 				update_character_state(selected_character, character_state.Phases.Selected)
 	pass
+
+func restore_original():
+	if selected_character && selected_char_original_pos:
+		selected_character.set_position(selected_char_original_pos)
+		camera.center_around_point(selected_char_original_pos)
 
 func handle_standby():
 	if selected_character:
@@ -119,6 +128,7 @@ func update_character_state(character, new_state):
 	match new_state:
 		character_state.Phases.Unselected:
 			hide_char_move_tiles()
+			restore_original()
 
 		character_state.Phases.Selected:
 			display_char_move_tiles(character, character.movement_range)
@@ -129,7 +139,7 @@ func update_character_state(character, new_state):
 		character_state.Phases.Action:
 			var menu_pos = camera.unproject_position(character.global_transform.origin)
 			menu_pos.x -= selected_char_menu.get_global_rect().size.x / 2
-			menu_pos.y -= 100
+			menu_pos.y += 75
 			selected_char_menu.rect_global_position = menu_pos
 			selected_char_menu.visible = true
 
@@ -140,6 +150,17 @@ func update_character_state(character, new_state):
 			selected_char_original_pos = null
 
 	character.curr_phase = new_state
+
+	# Check if all characters have finished their turn
+	var all_done = true
+	for c in characters.values():
+		if c.curr_phase != character_state.Phases.Done:
+			all_done = false
+			break
+
+	if all_done:
+		finalize_turn()
+
 	return
 
 func display_char_move_tiles(object, distance):

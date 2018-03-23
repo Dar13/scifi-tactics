@@ -1,15 +1,9 @@
 extends MeshInstance
 
-# class member variables go here, for example:
-# var a = 2
-# var b = "textvar"
-
 var material = null
-
 var color = Color(0.0, 0.0, 0.0, 1.0) setget set_color,get_color
 
 func _ready():
-	# Called every time the node is added to the scene.
 	# Initialization here
 	
 	material = self.get_surface_material(0)
