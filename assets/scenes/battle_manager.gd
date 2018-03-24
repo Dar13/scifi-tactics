@@ -66,13 +66,11 @@ func evaluate_battlefield():
 	return
 
 func start_next_turn():
-	print("starting next turn")
 	evaluate_battlefield()
 	character_mgr.prepare_for_turn(current_team)
 	return
 
 func finish_turn():
-	print("finishing turn")
 	# Move to next team
 	if current_team == player_team:
 		current_team = enemy_team

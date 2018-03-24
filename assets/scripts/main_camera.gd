@@ -1,12 +1,16 @@
 extends Camera
 
 # class member variables go here, for example:
-onready var position = CameraPosition.new()
+var position = null
 onready var tween = get_node("camera_tween")
 
 class CameraPosition:
 	var offset
 	var view_target
+
+	func _init():
+		view_target = Vector3(0, 0, 0)
+		offset = Vector3(8, 10, 8)
 
 	func update(camera, delta_angle):
 		self.offset = orbit_xz(delta_angle, offset)
@@ -21,17 +25,17 @@ class CameraPosition:
 		current.z = (translated.x * sin(angle)) + (translated.y * cos(angle))
 		return current
 
+func _init():
+	position = CameraPosition.new()
+
 func _ready():
 	# Initialization here, when added to tree
-	position.offset = Vector3(8, 10, 8)
-	position.view_target = Vector3(0, 0, 0)
 	position.update(self, 0)
 	pass
 
 func center_around_point(point):
 	tween.interpolate_property(position, "view_target", position.view_target, point, 1.0, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, 0)
 	tween.start()
-	#position.view_target = point
 	position.update(self, 0)
 
 func _process(delta):

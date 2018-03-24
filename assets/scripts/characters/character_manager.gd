@@ -24,10 +24,11 @@ var click_target = Vector3(0, 0, 0)
 func prepare_for_turn(new_characters):
 	characters = new_characters
 	for c in characters.values():
-		c.deselect()
+		c.deselect(true)
+
+	camera.position.view_target = characters.values().front().translation
 
 func finalize_turn():
-	print("turn done")
 	emit_signal("turn_done")
 
 # Called every time the node is added to the scene.
@@ -47,7 +48,7 @@ func _ready():
 	selected_char_menu.get_cancel_btn().connect("pressed", self, "handle_cancel")
 	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_standby")
 	call_deferred("add_child", selected_char_menu)
-	
+
 	return
 
 func _process(delta):
@@ -92,7 +93,7 @@ func handle_click(object):
 			var clicked_char = characters[object.get_instance_id()]
 			
 			if selected_character != clicked_char && selected_character != null:
-				selected_character.deselect()
+				selected_character.deselect(true)
 			# If we're clicking the selected character, just break out
 			elif selected_character == clicked_char:
 				return
@@ -150,11 +151,9 @@ func update_character_state(character, new_state):
 
 		character_state.Phases.Done:
 			emit_signal("battlefield_updated")
-			# Pre-emptively set the state for this case
-			character.curr_phase = new_state
 			selected_character = null
 			selected_char_original_pos = null
-			character.deselect()
+			character.deselect(false)
 
 	character.curr_phase = new_state
 

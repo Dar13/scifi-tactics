@@ -72,12 +72,13 @@ func select():
 	
 	return
 
-func deselect():
+func deselect(do_update):
 	is_selected = false
 	if character_material is SpatialMaterial:
 		character_material.albedo_color = Color(1.0, 0.0, 0.0, 1.0)
 	
-	emit_signal("update_state", self, state.Phases.Unselected)
+	if do_update:
+		emit_signal("update_state", self, state.Phases.Unselected)
 	
 	return
 
