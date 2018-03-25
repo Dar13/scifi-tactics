@@ -86,7 +86,7 @@ func handle_click(object):
 			selected_character.move(tile_map_pos)
 			
 			tile_pos.y += selected_character.character_mesh.get_aabb().size.y / 2
-			camera.center_around_point(tile_pos)
+			camera.center_around_point(tile_pos, camera.SPEED_LO)
 		# Did we click on a character?
 		elif characters.has(object.get_instance_id()) == true:
 			# Deselect the current character
@@ -101,7 +101,7 @@ func handle_click(object):
 			if clicked_char.curr_phase != character_state.Phases.Done:
 				selected_character = clicked_char
 				selected_character.select()
-				camera.center_around_point(selected_character.translation)
+				camera.center_around_point(selected_character.translation, camera.SPEED_LO)
 
 	pass
 
@@ -116,7 +116,7 @@ func handle_cancel():
 func restore_original():
 	if selected_character && selected_char_original_pos:
 		selected_character.set_position(selected_char_original_pos)
-		camera.center_around_point(selected_char_original_pos)
+		camera.center_around_point(selected_char_original_pos, camera.SPEED_LO)
 		selected_char_original_pos = null
 
 func handle_standby():

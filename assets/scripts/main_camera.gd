@@ -33,8 +33,11 @@ func _ready():
 	position.update(self, 0)
 	pass
 
-func center_around_point(point):
-	tween.interpolate_property(position, "view_target", position.view_target, point, 1.0, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, 0)
+const SPEED_LO = 0.50
+const SPEED_HI = 0.25
+
+func center_around_point(point, speed):
+	tween.interpolate_property(position, "view_target", position.view_target, point, speed, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, 0)
 	tween.start()
 	position.update(self, 0)
 
@@ -43,6 +46,46 @@ func _process(delta):
 	# Update game logic here.
 	position.update(self, 0)
 	pass
+
+const DIR_UP = 0
+const DIR_DOWN = 1
+const DIR_RIGHT = 2
+const DIR_LEFT = 3
+
+func get_camera_dir_vec(dir, no_y):
+	var vec = Vector3(0, 0, 0)
+	match dir:
+		DIR_UP:
+			vec = -transform.basis.z
+		DIR_DOWN:
+			vec = transform.basis.z
+		DIR_LEFT:
+			vec = -transform.basis.x
+		DIR_RIGHT:
+			vec = transform.basis.x
+
+	if no_y:
+		vec.y = 0
+
+	vec = vec.normalized()
+	return vec
+
+func _physics_process(delta):
+	var movement_dir = Vector3(0, 0, 0)
+	if Input.is_action_pressed("move_right"):
+		movement_dir += get_camera_dir_vec(DIR_RIGHT, true)
+	if Input.is_action_pressed("move_left"):
+		movement_dir += get_camera_dir_vec(DIR_LEFT, true)
+	if Input.is_action_pressed("move_up"):
+		movement_dir += get_camera_dir_vec(DIR_UP, true)
+	if Input.is_action_pressed("move_down"):
+		movement_dir += get_camera_dir_vec(DIR_DOWN, true)
+
+	# TODO: Fiddle about with the constant here, it's very much all about "feel"
+	# TODO: MAKE SURE TO TEST THIS SHIT AT HIGH FRAMERATES (preferably on a 120/144hz panel as well)
+	movement_dir = movement_dir.normalized() * 2
+	if movement_dir.length_squared() != 0:
+		center_around_point(position.view_target + movement_dir, SPEED_HI)
 
 func _input(event):
 	if event is InputEventMouseMotion:
