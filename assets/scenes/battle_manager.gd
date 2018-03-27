@@ -5,7 +5,8 @@ onready var camera = get_viewport().get_camera()
 onready var map = get_node("../map_root")
 
 onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
-var character_scene = preload("res://assets/models/characters/basic_character.tscn")
+const character_scene = preload("res://assets/scenes/character.tscn")
+const character_state = preload("res://assets/scripts/characters/character_state.gd")
 
 var current_team = null
 var player_team = {}
@@ -22,26 +23,29 @@ func _ready():
 	# Setup the 'player' team
 	var test_positions = [Vector3(0, 2, 0), Vector3(2, 2, 0), Vector3(-2, 2, 0)]
 	for i in range(3):
+		var state = character_state.new()
+		state.character_class = character_state.Classes.BASIC
+		
 		var character = character_scene.instance()
+		character.init(state, test_positions[i], true)
+		character.connect("update_phase", character_mgr, "update_character_phase")
+		
 		add_child(character)
-		character.set_position(test_positions[i])
-		character.map = map
-		character.show()
-		character.connect("update_state", character_mgr, "update_character_state")
 
-		player_team[character.get_instance_id()] = character
+		player_team[character.get_collider().get_instance_id()] = character
 
 	# Setup the 'enemy' team
 	test_positions = [Vector3(0, 6, -6), Vector3(2, 4, -6), Vector3(-2, 6, -6)]
 	for i in range(3):
+		var state = character_state.new()
+		state.character_class = character_state.Classes.BASIC
+		
 		var character = character_scene.instance()
+		character.init(state, test_positions[i], true)
+		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
-		character.set_position(test_positions[i])
-		character.map = map
-		character.show()
-		character.connect("update_state", character_mgr, "update_character_state")
 
-		enemy_team[character.get_instance_id()] = character
+		enemy_team[character.get_collider().get_instance_id()] = character
 	
 	# Player team starts the battle
 	current_team = player_team

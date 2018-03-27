@@ -3,9 +3,8 @@ extends Node
 signal battlefield_updated
 signal turn_done
 
-var character_scene = load("res://assets/models/characters/basic_character.tscn")
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
-var character_state = load("res://assets/scripts/characters/character_state.gd")
+const character = preload("res://assets/scripts/characters/character.gd")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 
 var characters = {}
@@ -85,7 +84,7 @@ func handle_click(object):
 			selected_char_original_pos = selected_character.translation
 			selected_character.move(tile_map_pos)
 			
-			tile_pos.y += selected_character.character_mesh.get_aabb().size.y / 2
+			tile_pos.y += selected_character.get_visual_bounds().size.y / 2
 			camera.center_around_point(tile_pos, camera.SPEED_LO)
 		# Did we click on a character?
 		elif characters.has(object.get_instance_id()) == true:
@@ -98,7 +97,7 @@ func handle_click(object):
 			elif selected_character == clicked_char:
 				return
 			
-			if clicked_char.curr_phase != character_state.Phases.Done:
+			if clicked_char.current_phase != character.Phases.Done:
 				selected_character = clicked_char
 				selected_character.select()
 				camera.center_around_point(selected_character.translation, camera.SPEED_LO)
@@ -107,10 +106,10 @@ func handle_click(object):
 
 func handle_cancel():
 	if selected_character:
-		match selected_character.curr_phase:
-			character_state.Phases.Action:
+		match selected_character.current_phase:
+			character.Phases.Action:
 				restore_original()
-				update_character_state(selected_character, character_state.Phases.Selected)
+				update_character_phase(selected_character, character.Phases.Selected)
 	pass
 
 func restore_original():
@@ -121,9 +120,9 @@ func restore_original():
 
 func handle_standby():
 	if selected_character:
-		update_character_state(selected_character, character_state.Phases.Done)
+		update_character_phase(selected_character, character.Phases.Done)
 
-func update_character_state(character, new_state):
+func update_character_phase(character, new_state):
 	if character == null:
 		return
 
@@ -131,36 +130,36 @@ func update_character_state(character, new_state):
 		selected_char_menu.visible = false
 	
 	match new_state:
-		character_state.Phases.Unselected:
+		character.Phases.Unselected:
 			hide_char_move_tiles()
-			if character.curr_phase != character_state.Phases.Done:
+			if character.current_phase != character.Phases.Done:
 				restore_original()
 
-		character_state.Phases.Selected:
-			display_char_move_tiles(character, character.movement_range)
+		character.Phases.Selected:
+			display_char_move_tiles(character, character.state.movement_range)
 
-		character_state.Phases.MoveStart:
+		character.Phases.MoveStart:
 			hide_char_move_tiles()
 
-		character_state.Phases.Action:
+		character.Phases.Action:
 			var menu_pos = camera.unproject_position(character.global_transform.origin)
 			menu_pos.x -= selected_char_menu.get_global_rect().size.x / 2
 			menu_pos.y += 75
 			selected_char_menu.rect_global_position = menu_pos
 			selected_char_menu.visible = true
 
-		character_state.Phases.Done:
+		character.Phases.Done:
 			emit_signal("battlefield_updated")
 			selected_character = null
 			selected_char_original_pos = null
 			character.deselect(false)
 
-	character.curr_phase = new_state
+	character.current_phase = new_state
 
 	# Check if all characters have finished their turn
 	var all_done = true
 	for c in characters.values():
-		if c.curr_phase != character_state.Phases.Done:
+		if c.current_phase != character.Phases.Done:
 			all_done = false
 			break
 
@@ -184,7 +183,7 @@ func display_char_move_tiles(object, distance):
 	# TODO: Raycast downwards to get precise Y-axis value?
 
 	# Get the possible move tiles for this character
-	var move_tiles = map.get_movement_space(char_pos, character.movement_range, 2)
+	var move_tiles = map.get_movement_space(char_pos, character.state.movement_range, 2)
 	var idx = 0
 	for tile in move_tiles:
 		var tile_world_pos = map.get_world_coords(tile.map_position)

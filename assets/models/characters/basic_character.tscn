@@ -7,7 +7,7 @@
 
 extents = Vector3( 1, 1, 1 )
 
-[node name="character_root" type="KinematicBody" index="0"]
+[node name="character_root" type="KinematicBody"]
 
 input_ray_pickable = true
 input_capture_on_drag = false
@@ -21,7 +21,6 @@ axis_lock_angular_y = false
 axis_lock_angular_z = false
 collision/safe_margin = 0.001
 script = ExtResource( 1 )
-movement_range = 5
 
 [node name="collision_shape" type="CollisionShape" parent="." index="0"]
 

@@ -11,10 +11,12 @@ const grid_directions = [Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1), 
 
 class MapCell:
 	var map_position		# Map coordinate of this tile
+	var world_position		# World coordinate of this tile
 	var previous			# Previous MapTile in path
 	var distance			# Number of MapTiles traveled to get to this point
-	func _init(pos, prev, dist):
-		map_position = pos
+	func _init(map_pos, world_pos, prev, dist):
+		map_position = map_pos
+		world_position = world_pos
 		previous = prev
 		distance = dist
 
@@ -59,7 +61,7 @@ func get_neighbors(map_pos, max_vertical):
 		
 		var vert_dist = map_pos.y - tmp.y
 		if vert_dist <= max_vertical && is_pos_in_grid(tmp) && obstacles.find(tmp) == -1:
-				neighbors.append(MapCell.new(tmp, null, 0))
+				neighbors.append(MapCell.new(tmp, get_world_coords(tmp), null, 0))
 	
 	return neighbors
 
@@ -69,7 +71,7 @@ func get_movement_space(world_pos, move_range, max_vertical):
 	if is_pos_in_grid(start_grid_pos) == false:
 		return []
 	
-	var visited_cells = [ MapCell.new(start_grid_pos, null, 0) ]
+	var visited_cells = [ MapCell.new(start_grid_pos, get_world_coords(start_grid_pos), null, 0) ]
 	var finished_cells = []
 	
 	while !visited_cells.empty():
