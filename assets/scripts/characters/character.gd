@@ -4,7 +4,7 @@ extends Spatial
 # of a character, from its state (class, stats, items, abilities, etc)
 # and it's visual and physical representation via the 'instance'
 
-enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, Attack, Use, Standby, Done }
+enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, Use, Standby, Done }
 onready var current_phase = Phases.Unselected
 
 signal update_phase(character, new_phase)
@@ -47,6 +47,9 @@ func _process(delta):
 
 func init(char_state, initial_position, initial_show):
 	state = char_state
+	
+	state.evaluate_initial_stats()
+	add_child(state)
 
 	instance = class_instances[state.character_class].instance()
 	set_position(initial_position)
@@ -57,6 +60,10 @@ func init(char_state, initial_position, initial_show):
 		instance.hide()
 
 	add_child(instance)
+
+func add_equipment(item):
+	state.add_equipment(item)
+	state.evaluate_initial_stats()
 
 func select():
 	instance.select()

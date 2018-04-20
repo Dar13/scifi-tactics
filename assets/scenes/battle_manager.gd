@@ -8,6 +8,8 @@ onready var character_mgr = load("res://assets/scripts/characters/character_mana
 const character_scene = preload("res://assets/scenes/character.tscn")
 const character_state = preload("res://assets/scripts/characters/character_state.gd")
 
+const weapon_scene = preload("res://assets/scenes/weapon.tscn")
+
 var current_team = null
 var player_team = {}
 var enemy_team = {}
@@ -46,6 +48,12 @@ func _ready():
 		add_child(character)
 
 		enemy_team[character.get_collider().get_instance_id()] = character
+
+	# Pick first player character for a weapon's test
+	var test_wep = weapon_scene.instance()
+	test_wep.init(test_wep.Name.BASIC)
+	var test_ch = player_team.values()[0]
+	test_ch.add_equipment(test_wep)
 	
 	# Player team starts the battle
 	current_team = player_team

@@ -44,6 +44,7 @@ func _ready():
 	
 	selected_char_menu = character_action_menu.instance()
 	selected_char_menu.visible = false
+	selected_char_menu.get_attack_btn().connect("pressed", self, "handle_attack")
 	selected_char_menu.get_cancel_btn().connect("pressed", self, "handle_cancel")
 	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_standby")
 	call_deferred("add_child", selected_char_menu)
@@ -110,7 +111,12 @@ func handle_cancel():
 			character.Phases.Action:
 				restore_original()
 				update_character_phase(selected_character, character.Phases.Selected)
-	pass
+
+func handle_attack():
+	if selected_character:
+		match selected_character.current_phase:
+			character.Phases.Action:
+				update_character_phase(selected_character, character.Phases.AttackWeapon)
 
 func restore_original():
 	if selected_character && selected_char_original_pos:
@@ -128,10 +134,10 @@ func update_character_phase(character, new_state):
 
 	if selected_char_menu.visible:
 		selected_char_menu.visible = false
-	
+
 	match new_state:
 		character.Phases.Unselected:
-			hide_char_move_tiles()
+			hide_char_tiles()
 			if character.current_phase != character.Phases.Done:
 				restore_original()
 
@@ -139,7 +145,7 @@ func update_character_phase(character, new_state):
 			display_char_move_tiles(character, character.state.movement_range)
 
 		character.Phases.MoveStart:
-			hide_char_move_tiles()
+			hide_char_tiles()
 
 		character.Phases.Action:
 			var menu_pos = camera.unproject_position(character.global_transform.origin)
@@ -147,6 +153,26 @@ func update_character_phase(character, new_state):
 			menu_pos.y += 75
 			selected_char_menu.rect_global_position = menu_pos
 			selected_char_menu.visible = true
+
+		character.Phases.AttackWeapon:
+			# 1. Get attack pattern based on selected weapon/ability
+			# TODO: Update to get selected weapon rather than first item
+			var wep = character.state.inventory[0]
+			var attack_space = wep.get_attack_pattern(map.get_map_coords(character.translation + Vector3(0, -2, 0)))
+
+			# 2. Update it against real map geometry
+			for idx in range(0, attack_space.size()):
+				var space_pos = attack_space[idx]
+				var height = map.get_cell_height_if_exists(space_pos)
+				if height == null:
+					space_pos.y = -101
+				else:
+					space_pos.y = height
+
+				attack_space[idx] = space_pos
+
+			# 3. Display
+			display_char_attack_tiles(attack_space)
 
 		character.Phases.Done:
 			emit_signal("battlefield_updated")
@@ -168,6 +194,21 @@ func update_character_phase(character, new_state):
 
 	return
 
+func display_char_attack_tiles(attack_space_locations):
+	if character == null:
+		print("Display attack tiles: null character!")
+		return
+
+	var idx = 0
+	for space in attack_space_locations:
+		if space == null || space.y < -100: continue
+		
+		var real_pos = map.get_world_coords(space)
+		real_pos.y += 1.1
+		
+		character_move_tiles[idx].display(real_pos, Color(1.0, 0.0, 0.0))
+		idx += 1
+
 func display_char_move_tiles(object, distance):
 	var character = null
 	# TODO: Is there a way to verify it's a character??
@@ -183,20 +224,18 @@ func display_char_move_tiles(object, distance):
 	# TODO: Raycast downwards to get precise Y-axis value?
 
 	# Get the possible move tiles for this character
-	var move_tiles = map.get_movement_space(char_pos, character.state.movement_range, 2)
+	var move_tiles = map.get_cells_in_range(char_pos, character.state.movement_range, 2)
 	var idx = 0
 	for tile in move_tiles:
 		var tile_world_pos = map.get_world_coords(tile.map_position)
 		tile_world_pos.y += 1.1
-		
+
 		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 1.0))
 		idx += 1
 	
 	character.set_movement_space(move_tiles)
-	
-	pass
 
-func hide_char_move_tiles():
+func hide_char_tiles():
 	for idx in range(10 * 10):
 		character_move_tiles[idx].hide()
 

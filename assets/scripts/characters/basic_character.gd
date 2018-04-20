@@ -11,8 +11,6 @@ func _ready():
 	character_material.albedo_color = Color(1.0, 0.0, 0.0, 1.0)
 	if character_mesh != null && character_mesh is MeshInstance:
 		character_mesh.set_surface_material(0, character_material)
-	
-	pass
 
 func _process(delta):
 	# Called every frame. Delta is time since last frame.
