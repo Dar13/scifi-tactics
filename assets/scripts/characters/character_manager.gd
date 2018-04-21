@@ -8,7 +8,8 @@ const move_tile = preload("res://assets/scripts/move_tile.gd")
 const character = preload("res://assets/scripts/characters/character.gd")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 
-var characters = {}
+var battle_characters = {}
+var current_team = {}
 var selected_character = null
 var character_move_tiles = []
 var selected_char_original_pos = Vector3(0,0,0)
@@ -21,15 +22,18 @@ var perform_raycast = false
 var click_origin = Vector3(0, 0, 0)
 var click_target = Vector3(0, 0, 0)
 
+func prepare_for_battle(all_characters):
+	battle_characters = all_characters
+
 # TODO: Need all characters for battle here (otherwise we can't target other team for attacks, just our own)
 # 		HOWEVER, we do need to know who is on the currently operating team
 #		e.g. prepare_for_turn(operating_team, characters) where operating_team IS SUBSET characters
 func prepare_for_turn(new_characters):
-	characters = new_characters
-	for c in characters.values():
+	current_team = new_characters
+	for c in current_team.values():
 		c.deselect(true)
 
-	camera.position.view_target = characters.values().front().translation
+	camera.position.view_target = current_team.values().front().translation
 
 func finalize_turn():
 	emit_signal("turn_done")
@@ -95,23 +99,29 @@ func handle_click(object):
 	if object != null:
 		var parent = object.get_parent()
 		if parent is character:
-			if characters.has(object.get_instance_id()):
-				var clicked_character = characters[object.get_instance_id()]
+			if battle_characters.has(object.get_instance_id()):
+				var clicked_character = battle_characters[object.get_instance_id()]
 
+				var clicked_is_on_team = current_team.has(object.get_instance_id())
 				if selected_character != null:
 					match selected_character.current_phase:
 						character.Phases.Selected:
-							if selected_character != clicked_character:
-								selected_character.deselect(true)
-							elif selected_character == clicked_character:
-								return # Player clicked the selected character
+							if clicked_is_on_team == true:
+								if selected_character != clicked_character:
+									selected_character.deselect(true)
+								elif selected_character == clicked_character:
+									return # Player clicked the selected character
 
-							select_character(clicked_character)
+								select_character(clicked_character)
+							else:
+								# Deselect? Clicked another team's character during movement selection
+								pass
 						character.Phases.AttackWeapon:
 							print("clicked another character while selecting attack target")
 							print("TODO: Determine if character is valid target")
-				else:
+				elif clicked_is_on_team == true:
 					select_character(clicked_character)
+
 		elif parent is move_tile:
 			var tile_idx = character_move_tiles.find(parent)
 			if tile_idx > -1:
@@ -210,7 +220,7 @@ func update_character_phase(character, new_state):
 
 	# Check if all characters have finished their turn
 	var all_done = true
-	for c in characters.values():
+	for c in current_team.values():
 		if c.current_phase != character.Phases.Done:
 			all_done = false
 			break

@@ -20,7 +20,7 @@ func _ready():
 	character_mgr.connect("turn_done", self, "finish_turn")
 	
 	# Initialize the battle scene
-	# For now this means, spawn the one team
+	# For now this means, spawn the teams
 	
 	# Setup the 'player' team
 	var test_positions = [Vector3(0, 2, 0), Vector3(2, 2, 0), Vector3(-2, 2, 0)]
@@ -48,6 +48,16 @@ func _ready():
 		add_child(character)
 
 		enemy_team[character.get_collider().get_instance_id()] = character
+
+	# Join the two teams together to pass to the character manager
+	var battle_characters = {}
+	for plr_key in player_team.keys():
+		battle_characters[plr_key] = player_team[plr_key]
+
+	for enem_key in enemy_team.keys():
+		battle_characters[enem_key] = enemy_team[enem_key]
+
+	character_mgr.prepare_for_battle(battle_characters)
 
 	# Pick first player character for a weapon's test
 	var test_wep = weapon_scene.instance()
