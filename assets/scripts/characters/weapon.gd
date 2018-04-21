@@ -3,7 +3,7 @@ extends "res://assets/scripts/characters/equipment.gd"
 # The various weapons
 # TODO: is there a better way to do this?
 const state_class = preload("res://assets/scripts/equipment/weapons/weapon_state.gd")
-const basic = preload("res://assets/models/eqiupment/basic_weapon/basic_weapon.tscn")
+const basic = preload("res://assets/models/equipment/basic_weapon/basic_weapon.tscn")
 
 # Weapon specialization of equipment
 enum Name {

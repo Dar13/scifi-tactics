@@ -3,13 +3,16 @@ extends MeshInstance
 var material = null
 var color = Color(0.0, 0.0, 0.0, 1.0) setget set_color,get_color
 
+var rigid_body = null
+
 func _ready():
 	# Initialization here
 	
 	material = self.get_surface_material(0)
 	set_color(color)
 	
-	pass
+	rigid_body = get_node("tile_body")
+	conceal()
 
 #func _process(delta):
 #	# Called every frame. Delta is time since last frame.
@@ -20,7 +23,13 @@ func display(new_pos, color):
 	set_identity()
 	global_translate(new_pos)
 	set_color(color)
+	# Enable collision layer 1
+	rigid_body.set_collision_layer_bit(0, true)
 	show()
+
+func conceal():
+	rigid_body.set_collision_layer_bit(0, false)
+	hide()
 
 func set_color(new_value):
 	if material is SpatialMaterial:

@@ -4,6 +4,7 @@ signal battlefield_updated
 signal turn_done
 
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
+const move_tile = preload("res://assets/scripts/move_tile.gd")
 const character = preload("res://assets/scripts/characters/character.gd")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 
@@ -20,6 +21,9 @@ var perform_raycast = false
 var click_origin = Vector3(0, 0, 0)
 var click_target = Vector3(0, 0, 0)
 
+# TODO: Need all characters for battle here (otherwise we can't target other team for attacks, just our own)
+# 		HOWEVER, we do need to know who is on the currently operating team
+#		e.g. prepare_for_turn(operating_team, characters) where operating_team IS SUBSET characters
 func prepare_for_turn(new_characters):
 	characters = new_characters
 	for c in characters.values():
@@ -39,8 +43,9 @@ func _ready():
 	for i in range(10 * 10):
 		character_move_tiles.append(move_tile_scene.instance())
 		
-		get_tree().get_root().call_deferred("add_child", character_move_tiles[i])
-		character_move_tiles[i].hide()
+		# The tiles will conceal themselves when their "_ready" is called
+		#get_tree().get_root().call_deferred("add_child", character_move_tiles[i])
+		add_child(character_move_tiles[i])
 	
 	selected_char_menu = character_action_menu.instance()
 	selected_char_menu.visible = false
@@ -73,37 +78,58 @@ func _unhandled_input(event):
 
 	return
 
+func select_character(ch):
+	if ch.current_phase != character.Phases.Done:
+		selected_character = ch
+		selected_character.select()
+		camera.center_around_point(selected_character.translation, camera.SPEED_LO)
+
 func handle_click(object):
+	# 1) Get parent as the collider given to us is the collision shape
+	# 2) Determine if parent is a selection tile, character, or just a map cell
+	# 3) Based on selected character and its state (or lack of one) to
+	#	a) Switch selection
+	#	b) Move character to selected tile
+	#	c) Attack character on selected tile
+	#	d) Use item on character on selected tile
 	if object != null:
 		var parent = object.get_parent()
-		var tile_idx = character_move_tiles.find(parent)
-		# Did we click on a displayed move tile?
-		if tile_idx != -1 && parent.visible:
-			var tile_pos = character_move_tiles[tile_idx].translation
-			tile_pos.y = round(tile_pos.y) 			# Should round down
-			var tile_map_pos = map.get_map_coords(tile_pos)
-			selected_char_original_pos = selected_character.translation
-			selected_character.move(tile_map_pos)
-			
-			tile_pos.y += selected_character.get_visual_bounds().size.y / 2
-			camera.center_around_point(tile_pos, camera.SPEED_LO)
-		# Did we click on a character?
-		elif characters.has(object.get_instance_id()) == true:
-			# Deselect the current character
-			var clicked_char = characters[object.get_instance_id()]
-			
-			if selected_character != clicked_char && selected_character != null:
-				selected_character.deselect(true)
-			# If we're clicking the selected character, just break out
-			elif selected_character == clicked_char:
-				return
-			
-			if clicked_char.current_phase != character.Phases.Done:
-				selected_character = clicked_char
-				selected_character.select()
-				camera.center_around_point(selected_character.translation, camera.SPEED_LO)
+		if parent is character:
+			if characters.has(object.get_instance_id()):
+				var clicked_character = characters[object.get_instance_id()]
 
-	pass
+				if selected_character != null:
+					match selected_character.current_phase:
+						character.Phases.Selected:
+							if selected_character != clicked_character:
+								selected_character.deselect(true)
+							elif selected_character == clicked_character:
+								return # Player clicked the selected character
+
+							select_character(clicked_character)
+						character.Phases.AttackWeapon:
+							print("clicked another character while selecting attack target")
+							print("TODO: Determine if character is valid target")
+				else:
+					select_character(clicked_character)
+		elif parent is move_tile:
+			var tile_idx = character_move_tiles.find(parent)
+			if tile_idx > -1:
+				var tile_world_pos = character_move_tiles[tile_idx].translation
+				tile_world_pos.y = round(tile_world_pos.y)
+				var tile_map_pos = map.get_map_coords(tile_world_pos)
+				if selected_character != null:
+					match selected_character.current_phase:
+						character.Phases.Selected:
+							selected_char_original_pos = selected_character.translation
+							selected_character.move(tile_map_pos)
+							tile_world_pos.y += selected_character.get_visual_bounds().size.y / 2
+							camera.center_around_point(tile_world_pos, camera.SPEED_LO)
+						character.Phases.AttackWeapon:
+							print("attack weapon tile clicked")
+		else:
+			print("clicked was on the map")
+	return
 
 func handle_cancel():
 	if selected_character:
@@ -165,7 +191,7 @@ func update_character_phase(character, new_state):
 				var space_pos = attack_space[idx]
 				var height = map.get_cell_height_if_exists(space_pos)
 				if height == null:
-					space_pos.y = -101
+					space_pos = null
 				else:
 					space_pos.y = height
 
@@ -201,7 +227,7 @@ func display_char_attack_tiles(attack_space_locations):
 
 	var idx = 0
 	for space in attack_space_locations:
-		if space == null || space.y < -100: continue
+		if space == null: continue
 		
 		var real_pos = map.get_world_coords(space)
 		real_pos.y += 1.1
@@ -237,5 +263,5 @@ func display_char_move_tiles(object, distance):
 
 func hide_char_tiles():
 	for idx in range(10 * 10):
-		character_move_tiles[idx].hide()
+		character_move_tiles[idx].conceal()
 

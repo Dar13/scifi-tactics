@@ -115,7 +115,7 @@ distance_fade_enable = false
 
 extents = Vector3( 1, 0.05, 1 )
 
-[node name="move_tile" type="MeshInstance"]
+[node name="move_tile" type="MeshInstance" index="0"]
 
 layers = 1
 material_override = null
