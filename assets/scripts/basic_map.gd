@@ -1,7 +1,7 @@
 extends Spatial
 
 onready var grid = get_node("map_grid")
-var grid_graph = []
+var grid_graph = {}
 var grid_min = Vector3(100, 100, 100)
 var grid_max = Vector3(-100, -100, -100)
 
@@ -41,7 +41,7 @@ func _ready():
 				if is_pos_in_grid(Vector3(x, y, z)) == true:
 					highest_y = y
 
-			grid_graph.append(Vector3(x, highest_y, z))
+			grid_graph[Vector2(x, z)] = Vector3(x, highest_y, z)
 
 	pass
 
@@ -52,9 +52,9 @@ func _ready():
 
 # Returns y-height if cell exists at X and Z coordinate, else returns null
 func get_cell_height_if_exists(map_pos):
-	for grid_cell in grid_graph:
-		if grid_cell.x == map_pos.x && grid_cell.z == map_pos.z:
-			return grid_cell.y
+	var xz = Vector2(map_pos.x, map_pos.z)
+	if grid_graph.has(xz):
+		return grid_graph[xz].y
 
 	return null
 
@@ -62,13 +62,11 @@ func get_neighbors(map_pos, max_vertical):
 	var neighbors = []
 	for dir in grid_directions:
 		var tmp = map_pos + dir
-		for cell in grid_graph:
-			if cell.x == tmp.x && cell.z == tmp.z:
-				tmp = cell
-				break;
+		if grid_graph.has(Vector2(tmp.x, tmp.z)) == true:
+			tmp = grid_graph[Vector2(tmp.x, tmp.z)]
 		
-		var vert_dist = map_pos.y - tmp.y
-		if vert_dist <= max_vertical && is_pos_in_grid(tmp) && obstacles.find(tmp) == -1:
+			var vert_dist = map_pos.y - tmp.y
+			if vert_dist <= max_vertical && is_pos_in_grid(tmp) && obstacles.find(tmp) == -1:
 				neighbors.append(MapCell.new(tmp, get_world_coords(tmp), null, 0))
 	
 	return neighbors
@@ -122,7 +120,7 @@ func contains_cell(cell, container):
 	for i in container:
 		if cell.map_position == i.map_position:
 			return i
-		
+
 	return null
 
 func is_pos_in_grid(map_pos):

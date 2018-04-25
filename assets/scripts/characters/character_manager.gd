@@ -101,8 +101,8 @@ func handle_click(object):
 		if parent is character:
 			if battle_characters.has(object.get_instance_id()):
 				var clicked_character = battle_characters[object.get_instance_id()]
-
 				var clicked_is_on_team = current_team.has(object.get_instance_id())
+
 				if selected_character != null:
 					match selected_character.current_phase:
 						character.Phases.Selected:
