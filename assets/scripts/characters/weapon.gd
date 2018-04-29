@@ -27,3 +27,12 @@ func get_attack_pattern(map_pos):
 func do_special_effect(character):
 	instance.do_special_effect(character)	# Dispatch?
 	pass
+
+func do_attack(object):
+	return instance.do_attack(object)
+
+func get_name():
+	return instance.weapon_name
+
+func get_thumbnail():
+	return instance.thumbnail

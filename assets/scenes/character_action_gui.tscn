@@ -6,7 +6,7 @@
 [ext_resource path="res://assets/gui/standby_btn.png" type="Texture" id=4]
 [ext_resource path="res://assets/gui/cancel_btn.png" type="Texture" id=5]
 
-[node name="root" type="HBoxContainer" index="0"]
+[node name="root" type="HBoxContainer"]
 
 anchor_left = 0.0
 anchor_top = 0.0

@@ -7,6 +7,7 @@ var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 const move_tile = preload("res://assets/scripts/move_tile.gd")
 const character = preload("res://assets/scripts/characters/character.gd")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
+var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
 
 var battle_characters = {}
 var current_team = {}
@@ -14,6 +15,7 @@ var selected_character = null
 var character_move_tiles = []
 var selected_char_original_pos = Vector3(0,0,0)
 var selected_char_menu = null
+var selected_char_wep_menu = null
 
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../../map_root")
@@ -57,6 +59,11 @@ func _ready():
 	selected_char_menu.get_cancel_btn().connect("pressed", self, "handle_cancel")
 	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_standby")
 	call_deferred("add_child", selected_char_menu)
+	
+	selected_char_wep_menu = character_weapon_select_menu.instance()
+	selected_char_wep_menu.visible = false
+	selected_char_wep_menu.connect("weapon_selected", self, "handle_selected_weapon")
+	add_child(selected_char_wep_menu)
 
 	return
 
@@ -117,8 +124,16 @@ func handle_click(object):
 								# Deselect? Clicked another team's character during movement selection
 								pass
 						character.Phases.AttackWeapon:
-							print("clicked another character while selecting attack target")
-							print("TODO: Determine if character is valid target")
+							var clicked_world_pos = clicked_character.translation
+							clicked_world_pos.y = floor(clicked_world_pos.y - clicked_character.get_visual_bounds().size.y / 2)
+							var clicked_map_coord = map.get_map_coords(clicked_world_pos)
+
+							for tile in character_move_tiles:
+								var world_pos = tile.translation
+								world_pos.y = floor(world_pos.y)
+								var tile_map_coord = map.get_map_coords(world_pos)
+								if tile.visible == true && clicked_map_coord == tile_map_coord:
+									print("character is on move tile %s" % [tile])
 				elif clicked_is_on_team == true:
 					select_character(clicked_character)
 
@@ -136,7 +151,7 @@ func handle_click(object):
 							tile_world_pos.y += selected_character.get_visual_bounds().size.y / 2
 							camera.center_around_point(tile_world_pos, camera.SPEED_LO)
 						character.Phases.AttackWeapon:
-							print("attack weapon tile clicked")
+							print("TODO: Check weapon if this is valid attack target")
 		else:
 			print("clicked was on the map")
 	return
@@ -152,7 +167,16 @@ func handle_attack():
 	if selected_character:
 		match selected_character.current_phase:
 			character.Phases.Action:
-				update_character_phase(selected_character, character.Phases.AttackWeapon)
+				selected_char_wep_menu.set_weapons(selected_character.state.inventory)
+				selected_char_menu.visible = false
+				selected_char_wep_menu.visible = true
+				#update_character_phase(selected_character, character.Phases.AttackWeapon)
+
+func handle_selected_weapon():
+	if selected_char_wep_menu.selected_weapon == null:
+		update_character_phase(selected_character, character.Phases.Action)
+	else:
+		print("weapon was selected")
 
 func restore_original():
 	if selected_character && selected_char_original_pos:
@@ -170,6 +194,9 @@ func update_character_phase(character, new_state):
 
 	if selected_char_menu.visible:
 		selected_char_menu.visible = false
+
+	if selected_char_wep_menu.visible:
+		selected_char_wep_menu.visible = false
 
 	match new_state:
 		character.Phases.Unselected:
