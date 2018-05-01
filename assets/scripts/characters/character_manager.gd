@@ -8,14 +8,19 @@ const move_tile = preload("res://assets/scripts/move_tile.gd")
 const character = preload("res://assets/scripts/characters/character.gd")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
+var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
 
 var battle_characters = {}
 var current_team = {}
 var selected_character = null
 var character_move_tiles = []
+
 var selected_char_original_pos = Vector3(0,0,0)
 var selected_char_menu = null
 var selected_char_wep_menu = null
+var selected_char_weapon = null
+
+onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../../map_root")
@@ -64,6 +69,11 @@ func _ready():
 	selected_char_wep_menu.visible = false
 	selected_char_wep_menu.connect("weapon_selected", self, "handle_selected_weapon")
 	add_child(selected_char_wep_menu)
+
+	selected_char_attack_confirm.visible = false
+	selected_char_attack_confirm.connect("cancelled", self, "handle_cancel")
+	selected_char_attack_confirm.connect("confirmed", self, "handle_attack")
+	add_child(selected_char_attack_confirm)
 
 	return
 
@@ -133,7 +143,7 @@ func handle_click(object):
 								world_pos.y = floor(world_pos.y)
 								var tile_map_coord = map.get_map_coords(world_pos)
 								if tile.visible == true && clicked_map_coord == tile_map_coord:
-									print("character is on move tile %s" % [tile])
+									update_character_phase(selected_character, character.Phases.AttackConfirm)
 				elif clicked_is_on_team == true:
 					select_character(clicked_character)
 
@@ -151,7 +161,7 @@ func handle_click(object):
 							tile_world_pos.y += selected_character.get_visual_bounds().size.y / 2
 							camera.center_around_point(tile_world_pos, camera.SPEED_LO)
 						character.Phases.AttackWeapon:
-							print("TODO: Check weapon if this is valid attack target")
+							update_character_phase(selected_character, character.Phases.AttackConfirm)
 		else:
 			print("clicked was on the map")
 	return
@@ -162,6 +172,9 @@ func handle_cancel():
 			character.Phases.Action:
 				restore_original()
 				update_character_phase(selected_character, character.Phases.Selected)
+			character.Phases.AttackWeapon:
+				hide_char_tiles()
+				update_character_phase(selected_character, character.Phases.Action)
 
 func handle_attack():
 	if selected_character:
@@ -170,13 +183,16 @@ func handle_attack():
 				selected_char_wep_menu.set_weapons(selected_character.state.inventory)
 				selected_char_menu.visible = false
 				selected_char_wep_menu.visible = true
-				#update_character_phase(selected_character, character.Phases.AttackWeapon)
+			character.Phases.AttackConfirm:
+				print("TODO: Do attack!")
+				update_character_phase(selected_character, character.Phases.Done)
 
 func handle_selected_weapon():
 	if selected_char_wep_menu.selected_weapon == null:
 		update_character_phase(selected_character, character.Phases.Action)
 	else:
-		print("weapon was selected")
+		selected_char_weapon = selected_char_wep_menu.selected_weapon
+		update_character_phase(selected_character, character.Phases.AttackWeapon)
 
 func restore_original():
 	if selected_character && selected_char_original_pos:
@@ -192,11 +208,9 @@ func update_character_phase(character, new_state):
 	if character == null:
 		return
 
-	if selected_char_menu.visible:
-		selected_char_menu.visible = false
-
-	if selected_char_wep_menu.visible:
-		selected_char_wep_menu.visible = false
+	selected_char_menu.hide()
+	selected_char_wep_menu.hide()
+	selected_char_attack_confirm.hide()
 
 	match new_state:
 		character.Phases.Unselected:
@@ -219,9 +233,7 @@ func update_character_phase(character, new_state):
 
 		character.Phases.AttackWeapon:
 			# 1. Get attack pattern based on selected weapon/ability
-			# TODO: Update to get selected weapon rather than first item
-			var wep = character.state.inventory[0]
-			var attack_space = wep.get_attack_pattern(map.get_map_coords(character.translation + Vector3(0, -2, 0)))
+			var attack_space = selected_char_weapon.get_attack_pattern(map.get_map_coords(character.translation + Vector3(0, -2, 0)))
 
 			# 2. Update it against real map geometry
 			for idx in range(0, attack_space.size()):
@@ -237,8 +249,17 @@ func update_character_phase(character, new_state):
 			# 3. Display
 			display_char_attack_tiles(attack_space)
 
+			# 4. Display the confirm/cancel dialog
+			selected_char_attack_confirm.selection_mode();
+			selected_char_attack_confirm.show()
+
+		character.Phases.AttackConfirm:
+			selected_char_attack_confirm.confirmation_mode();
+			selected_char_attack_confirm.show()
+
 		character.Phases.Done:
 			emit_signal("battlefield_updated")
+			hide_char_tiles()
 			selected_character = null
 			selected_char_original_pos = null
 			character.deselect(false)

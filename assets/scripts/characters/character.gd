@@ -4,7 +4,7 @@ extends Spatial
 # of a character, from its state (class, stats, items, abilities, etc)
 # and it's visual and physical representation via the 'instance'
 
-enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, Use, Standby, Done }
+enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, AttackConfirm, Use, Standby, Done }
 onready var current_phase = Phases.Unselected
 
 signal update_phase(character, new_phase)
