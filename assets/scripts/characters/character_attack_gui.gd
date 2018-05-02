@@ -18,9 +18,9 @@ func selection_mode():
 	target_confirm_dlg.hide()
 	cancel_attack_btn.show()
 
-func confirmation_mode():
+func confirmation_mode(screen_coord):
 	cancel_attack_btn.hide()
-	target_confirm_dlg.popup(Rect2(0, 0, 128, 128))
+	target_confirm_dlg.popup(Rect2(screen_coord, Vector2(128, 64)))
 
 func handle_selection(selected_id):
 	if selected_id == 1:

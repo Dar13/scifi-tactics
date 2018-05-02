@@ -20,6 +20,8 @@ var selected_char_menu = null
 var selected_char_wep_menu = null
 var selected_char_weapon = null
 
+var attack_target = null
+
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 
 onready var camera = get_viewport().get_camera()
@@ -143,6 +145,7 @@ func handle_click(object):
 								world_pos.y = floor(world_pos.y)
 								var tile_map_coord = map.get_map_coords(world_pos)
 								if tile.visible == true && clicked_map_coord == tile_map_coord:
+									attack_target = clicked_character
 									update_character_phase(selected_character, character.Phases.AttackConfirm)
 				elif clicked_is_on_team == true:
 					select_character(clicked_character)
@@ -161,6 +164,7 @@ func handle_click(object):
 							tile_world_pos.y += selected_character.get_visual_bounds().size.y / 2
 							camera.center_around_point(tile_world_pos, camera.SPEED_LO)
 						character.Phases.AttackWeapon:
+							attack_target = parent
 							update_character_phase(selected_character, character.Phases.AttackConfirm)
 		else:
 			print("clicked was on the map")
@@ -175,6 +179,8 @@ func handle_cancel():
 			character.Phases.AttackWeapon:
 				hide_char_tiles()
 				update_character_phase(selected_character, character.Phases.Action)
+			character.Phases.AttackConfirm:
+				update_character_phase(selected_character, character.Phases.AttackWeapon)
 
 func handle_attack():
 	if selected_character:
@@ -254,7 +260,7 @@ func update_character_phase(character, new_state):
 			selected_char_attack_confirm.show()
 
 		character.Phases.AttackConfirm:
-			selected_char_attack_confirm.confirmation_mode();
+			selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
 			selected_char_attack_confirm.show()
 
 		character.Phases.Done:
