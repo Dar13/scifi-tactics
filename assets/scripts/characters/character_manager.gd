@@ -6,6 +6,7 @@ signal turn_done
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 const move_tile = preload("res://assets/scripts/move_tile.gd")
 const character = preload("res://assets/scripts/characters/character.gd")
+var character_stats_menu = load("res://assets/scenes/character_stats_gui.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
 var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
@@ -24,6 +25,8 @@ var attack_target = null
 
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 
+onready var char_stats_menu = character_stats_menu.instance()
+
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../../map_root")
 
@@ -34,9 +37,6 @@ var click_target = Vector3(0, 0, 0)
 func prepare_for_battle(all_characters):
 	battle_characters = all_characters
 
-# TODO: Need all characters for battle here (otherwise we can't target other team for attacks, just our own)
-# 		HOWEVER, we do need to know who is on the currently operating team
-#		e.g. prepare_for_turn(operating_team, characters) where operating_team IS SUBSET characters
 func prepare_for_turn(new_characters):
 	current_team = new_characters
 	for c in current_team.values():
@@ -57,7 +57,6 @@ func _ready():
 		character_move_tiles.append(move_tile_scene.instance())
 		
 		# The tiles will conceal themselves when their "_ready" is called
-		#get_tree().get_root().call_deferred("add_child", character_move_tiles[i])
 		add_child(character_move_tiles[i])
 	
 	selected_char_menu = character_action_menu.instance()
@@ -76,6 +75,9 @@ func _ready():
 	selected_char_attack_confirm.connect("cancelled", self, "handle_cancel")
 	selected_char_attack_confirm.connect("confirmed", self, "handle_attack")
 	add_child(selected_char_attack_confirm)
+	
+	char_stats_menu.visible = false
+	add_child(char_stats_menu)
 
 	return
 
@@ -105,6 +107,7 @@ func select_character(ch):
 	if ch.current_phase != character.Phases.Done:
 		selected_character = ch
 		selected_character.select()
+		
 		camera.center_around_point(selected_character.translation, camera.SPEED_LO)
 
 func handle_click(object):
@@ -190,7 +193,7 @@ func handle_attack():
 				selected_char_menu.visible = false
 				selected_char_wep_menu.visible = true
 			character.Phases.AttackConfirm:
-				print("TODO: Do attack!")
+				selected_char_weapon.do_attack(attack_target)
 				update_character_phase(selected_character, character.Phases.Done)
 
 func handle_selected_weapon():
@@ -221,11 +224,15 @@ func update_character_phase(character, new_state):
 	match new_state:
 		character.Phases.Unselected:
 			hide_char_tiles()
+			char_stats_menu.hide()
 			if character.current_phase != character.Phases.Done:
 				restore_original()
 
 		character.Phases.Selected:
 			display_char_move_tiles(character, character.state.movement_range)
+			
+			char_stats_menu.populate(selected_character)
+			char_stats_menu.show()
 
 		character.Phases.MoveStart:
 			hide_char_tiles()
@@ -235,7 +242,7 @@ func update_character_phase(character, new_state):
 			menu_pos.x -= selected_char_menu.get_global_rect().size.x / 2
 			menu_pos.y += 75
 			selected_char_menu.rect_global_position = menu_pos
-			selected_char_menu.visible = true
+			selected_char_menu.show()
 
 		character.Phases.AttackWeapon:
 			# 1. Get attack pattern based on selected weapon/ability
@@ -266,6 +273,7 @@ func update_character_phase(character, new_state):
 		character.Phases.Done:
 			emit_signal("battlefield_updated")
 			hide_char_tiles()
+			char_stats_menu.hide()
 			selected_character = null
 			selected_char_original_pos = null
 			character.deselect(false)

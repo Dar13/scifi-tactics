@@ -21,9 +21,11 @@ var level = 1
 var experience = 0		# Level up occurs at experience == 100
 
 # Aggregate attributes
-var health = 0				# Hitpoints of character
+var health = 0				# Current hitpoints of character
+var max_health = 0			# Maximum hitpoints of character
 #var health_gain = 0		# TODO: Regenerating health?
-var energy = 0				# Energy of character, used by abilities and special weapons
+var energy = 0				# Current energy of character, used by abilities and special weapons
+var max_energy = 0			# Max energy of character
 var start_energy = 0		# Starting energy of character at start of battle
 var energy_gain = 0			# Energy gain per turn of character
 var armor = 0				# Modifier on all physical damage taken
@@ -52,7 +54,9 @@ func evaluate_initial_stats():
 	match character_class:
 		Classes.BASIC:
 			health = level * 60
+			max_health = health
 			energy = level * 25
+			max_energy = energy
 			start_energy = 5
 			energy_gain = 5
 			armor = 4
