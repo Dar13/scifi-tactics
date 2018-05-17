@@ -30,9 +30,11 @@ onready var char_stats_menu = character_stats_menu.instance()
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../../map_root")
 
-var perform_raycast = false
-var click_origin = Vector3(0, 0, 0)
-var click_target = Vector3(0, 0, 0)
+var perform_click_raycast = false
+
+var mouse_pos = Vector2(0, 0)
+var mouse_over_last = null
+onready var mouse_last_moved = OS.get_ticks_msec()
 
 func prepare_for_battle(all_characters):
 	battle_characters = all_characters
@@ -81,25 +83,53 @@ func _ready():
 
 	return
 
-func _process(delta):
-	# Called every frame. Delta is time since last frame.
-	# Update game logic here.
-	if perform_raycast == true:
-		var space = camera.get_world().get_direct_space_state()
-		var raycast_results = space.intersect_ray(click_origin, click_target)
-		perform_raycast = false
-		if raycast_results.empty() == false:
-			handle_click(raycast_results["collider"])
+func _physics_process(delta):
+	# Called every physics timestep. Delta is time since last frame.
+	# Perform a raycast every timestep, used for mouse-over handling and will
+	# be used for various other things I'm sure.
+	var cast_origin = camera.project_ray_origin(mouse_pos)
+	var cast_target = camera.project_ray_normal(mouse_pos) * 5000
+	var phys_space = camera.get_world().get_direct_space_state()
+	var cast_result = phys_space.intersect_ray(cast_origin, cast_target)
+
+	# Click processing here
+	if perform_click_raycast == true:
+		perform_click_raycast = false
+		if cast_result.empty() == false:
+			handle_click(cast_result["collider"])
 		else:
 			handle_click(null)
-
-	pass
+	else:
+		if cast_result.empty() == false:
+			var collider_parent = cast_result["collider"].get_parent()
+			if collider_parent != null:
+				if collider_parent == mouse_over_last:
+					var diff = (OS.get_ticks_msec() - mouse_last_moved) / 1000.0
+					# If the difference is greater than a second, display the stats panel
+					if diff > 1:
+						char_stats_menu.populate(mouse_over_last)
+						char_stats_menu.popup(Rect2(Vector2(mouse_pos.x + 1, mouse_pos.y + 1), Vector2(128, 196)))
+						char_stats_menu.grab_click_focus()
+				else:
+					# Ensure the collider is a character (or part of the map??, haven't decided)
+					if collider_parent is character:
+						mouse_over_last = collider_parent
+	return
 
 func _unhandled_input(event):
 	if event.is_action("left_click") && event.pressed == false:
-		click_origin = camera.project_ray_origin(event.position)
-		click_target = click_origin + camera.project_ray_normal(event.position) * 5000
-		perform_raycast = true
+		perform_click_raycast = true
+
+	if event is InputEventMouse:
+		mouse_pos = event.global_position
+
+	if event is InputEventMouseMotion:
+		# TODO: Fuzz factor, in case someone has shaky hands or buggy mouse?
+		mouse_last_moved = OS.get_ticks_msec()
+		if char_stats_menu.visible && char_stats_menu.get_global_rect().grow(1).has_point(mouse_pos) == false:
+			char_stats_menu.hide()
+			# Uncomment when expansion/shrink is implemented
+			#char_stats_menu.shrink()
 
 	return
 
@@ -224,15 +254,11 @@ func update_character_phase(character, new_state):
 	match new_state:
 		character.Phases.Unselected:
 			hide_char_tiles()
-			char_stats_menu.hide()
 			if character.current_phase != character.Phases.Done:
 				restore_original()
 
 		character.Phases.Selected:
 			display_char_move_tiles(character, character.state.movement_range)
-			
-			char_stats_menu.populate(selected_character)
-			char_stats_menu.show()
 
 		character.Phases.MoveStart:
 			hide_char_tiles()
@@ -273,7 +299,6 @@ func update_character_phase(character, new_state):
 		character.Phases.Done:
 			emit_signal("battlefield_updated")
 			hide_char_tiles()
-			char_stats_menu.hide()
 			selected_character = null
 			selected_char_original_pos = null
 			character.deselect(false)

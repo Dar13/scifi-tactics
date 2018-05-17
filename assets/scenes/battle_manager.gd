@@ -14,6 +14,8 @@ var current_team = null
 var player_team = {}
 var enemy_team = {}
 
+onready var fps_label = get_node("../fps_label")
+
 func _ready():
 	add_child(character_mgr)
 	character_mgr.connect("battlefield_updated", self, "evaluate_battlefield")
@@ -102,7 +104,5 @@ func finish_turn():
 	start_next_turn()
 	return
 
-#func _process(delta):
-#	# Called every frame. Delta is time since last frame.
-#	# Update game logic here.
-#	pass
+func _process(delta):
+	fps_label.text = "FPS: %s" % Engine.get_frames_per_second()
