@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=3]
 [ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=4]
 
-[node name="root" type="Node"]
+[node name="root" type="Node" index="0"]
 
 [node name="light" type="OmniLight" parent="." index="0"]
 

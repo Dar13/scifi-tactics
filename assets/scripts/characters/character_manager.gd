@@ -10,6 +10,7 @@ var character_stats_menu = load("res://assets/scenes/character_stats_gui.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
 var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
+var attack_preview_menu = load("res://assets/scenes/gui/character_attack_preview.tscn")
 
 var battle_characters = {}
 var current_team = {}
@@ -24,6 +25,7 @@ var selected_char_weapon = null
 var attack_target = null
 
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
+onready var selected_char_attack_preview = attack_preview_menu.instance()
 
 onready var char_stats_menu = character_stats_menu.instance()
 
@@ -77,6 +79,9 @@ func _ready():
 	selected_char_attack_confirm.connect("cancelled", self, "handle_cancel")
 	selected_char_attack_confirm.connect("confirmed", self, "handle_attack")
 	add_child(selected_char_attack_confirm)
+	
+	selected_char_attack_preview.visible = false
+	add_child(selected_char_attack_preview)
 	
 	char_stats_menu.visible = false
 	add_child(char_stats_menu)
@@ -250,6 +255,7 @@ func update_character_phase(character, new_state):
 	selected_char_menu.hide()
 	selected_char_wep_menu.hide()
 	selected_char_attack_confirm.hide()
+	selected_char_attack_preview.hide()
 
 	match new_state:
 		character.Phases.Unselected:
@@ -295,6 +301,10 @@ func update_character_phase(character, new_state):
 		character.Phases.AttackConfirm:
 			selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
 			selected_char_attack_confirm.show()
+			
+			# TODO: Calculate actual attack information
+			selected_char_attack_preview.populate({"name": "Darius", "damage": 5}, {"name": "Ellie", "damage": 3})
+			selected_char_attack_preview.show()
 
 		character.Phases.Done:
 			emit_signal("battlefield_updated")
