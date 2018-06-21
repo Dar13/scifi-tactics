@@ -108,7 +108,8 @@ func _physics_process(delta):
 		if cast_result.empty() == false:
 			var collider_parent = cast_result["collider"].get_parent()
 			if collider_parent != null:
-				if collider_parent == mouse_over_last:
+				# Don't popup the character stats if it's for an attack target
+				if collider_parent == mouse_over_last and collider_parent != attack_target:
 					var diff = (OS.get_ticks_msec() - mouse_last_moved) / 1000.0
 					# If the difference is greater than a second, display the stats panel
 					if diff > 1:
