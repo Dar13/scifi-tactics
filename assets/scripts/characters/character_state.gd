@@ -78,7 +78,7 @@ func evaluate_initial_stats():
 	
 	# Now evaluate equipment (includes weapons)
 
-# Called after every turn, used for temporary effects (turn-based increases to PWR/SKL/EPT/etc)
+# Called after every turn, used for temporary effects (ENG increment, turn-based increases to PWR/SKL/EPT/etc)
 func evaluate_turn_end():
 	print("TODO: evaluate_turn_end()")
 

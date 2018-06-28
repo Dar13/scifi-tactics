@@ -11,6 +11,7 @@ var character_action_menu = load("res://assets/scenes/character_action_gui.tscn"
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
 var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
 var attack_preview_menu = load("res://assets/scenes/gui/character_attack_preview.tscn")
+const attack_context_type = preload("res://assets/scripts/battle/attack_context.gd")
 
 var battle_characters = {}
 var current_team = {}
@@ -23,6 +24,7 @@ var selected_char_wep_menu = null
 var selected_char_weapon = null
 
 var attack_target = null
+var attack_context = null
 
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 onready var selected_char_attack_preview = attack_preview_menu.instance()
@@ -302,9 +304,10 @@ func update_character_phase(character, new_state):
 		character.Phases.AttackConfirm:
 			selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
 			selected_char_attack_confirm.show()
-			
-			# TODO: Calculate actual attack information
-			selected_char_attack_preview.populate({"name": "Darius", "damage": 5}, {"name": "Ellie", "damage": 3})
+
+			attack_context = attack_context_type.generate_context(selected_character, attack_target)
+
+			selected_char_attack_preview.populate(attack_context)
 			selected_char_attack_preview.show()
 
 		character.Phases.Done:

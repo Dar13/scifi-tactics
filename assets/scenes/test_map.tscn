@@ -9,7 +9,7 @@
 
 [node name="light" type="OmniLight" parent="." index="0"]
 
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.59169, 5.92643, -3.44254 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.59169, 10.9264, -3.44254 )
 layers = 1
 light_color = Color( 1, 1, 1, 1 )
 light_energy = 1.0
@@ -24,7 +24,7 @@ shadow_bias = 0.15
 shadow_contact = 0.0
 shadow_reverse_cull_face = false
 editor_only = false
-omni_range = 6.0
+omni_range = 18.0115
 omni_attenuation = 1.0
 omni_shadow_mode = 1
 omni_shadow_detail = 1
