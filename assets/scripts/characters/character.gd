@@ -4,7 +4,11 @@ extends Spatial
 # of a character, from its state (class, stats, items, abilities, etc)
 # and it's visual and physical representation via the 'instance'
 
+# This is only relevant in the context of a battle, and there are
+# battle-specific data in here
+
 enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, AttackConfirm, Use, Standby, Done }
+enum FaceDirection { North, South, East, West }
 onready var current_phase = Phases.Unselected
 
 signal update_phase(character, new_phase)
@@ -17,6 +21,7 @@ const class_instances = {
 }
 
 var instance = null
+var facing = FaceDirection.North
 
 # Movement information
 var movement_cells = []
@@ -41,11 +46,12 @@ func _process(delta):
 			translate(direction)
 
 			var distance = self.translation.distance_to(target_world_pos)
+			# Snap to the final solution if we're close enough
 			if distance <= 0.01:
 				set_position(target_world_pos)
 				movement_path.pop_front()
 
-func init(char_state, initial_position, initial_show):
+func init(char_state, initial_position, initial_show, direction):
 	state = char_state
 	
 	state.evaluate_initial_stats()
@@ -59,11 +65,25 @@ func init(char_state, initial_position, initial_show):
 	else:
 		instance.hide()
 
+	match direction:
+		FaceDirection.North:
+			pass
+		FaceDirection.East:
+			pass
+		FaceDirection.West:
+			pass
+		FaceDirection.South:
+			pass
+
 	add_child(instance)
 
 func add_equipment(item):
 	state.add_equipment(item)
 	state.evaluate_initial_stats()
+
+# This name suuuuuuckss....
+func set_on_player_team():
+	instance.set_on_player_team()
 
 func select():
 	instance.select()

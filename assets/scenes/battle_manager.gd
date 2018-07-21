@@ -7,6 +7,7 @@ onready var map = get_node("../map_root")
 onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
 const character_scene = preload("res://assets/scenes/character.tscn")
 const character_state = preload("res://assets/scripts/characters/character_state.gd")
+const character_class = preload("res://assets/scripts/characters/character.gd")
 
 const weapon_scene = preload("res://assets/scenes/weapon.tscn")
 
@@ -31,8 +32,9 @@ func _ready():
 		state.character_class = character_state.Classes.BASIC
 		
 		var character = character_scene.instance()
-		character.init(state, test_positions[i], true)
+		character.init(state, test_positions[i], true, character_class.FaceDirection.North)
 		character.connect("update_phase", character_mgr, "update_character_phase")
+		character.set_on_player_team()
 		
 		add_child(character)
 
@@ -45,7 +47,7 @@ func _ready():
 		state.character_class = character_state.Classes.BASIC
 		
 		var character = character_scene.instance()
-		character.init(state, test_positions[i], true)
+		character.init(state, test_positions[i], true, character_class.FaceDirection.South)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
 

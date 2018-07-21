@@ -2,6 +2,8 @@ extends Node
 
 # This is the data section of a character, containing the character class,
 # combat stats, character stats, items held, abilities, learned, level, experience, etc.
+#
+# This persists between battles.
 
 # Array of equipment on this character
 var inventory = []
