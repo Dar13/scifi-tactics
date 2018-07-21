@@ -6,6 +6,7 @@ signal turn_done
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 const move_tile = preload("res://assets/scripts/move_tile.gd")
 const character = preload("res://assets/scripts/characters/character.gd")
+const character_dir = preload("res://assets/scripts/characters/character_direction.gd")
 var character_stats_menu = load("res://assets/scenes/character_stats_gui.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
@@ -19,6 +20,7 @@ var selected_character = null
 var character_move_tiles = []
 
 var selected_char_original_pos = Vector3(0,0,0)
+var selected_char_original_direction = null
 var selected_char_menu = null
 var selected_char_wep_menu = null
 var selected_char_weapon = null
@@ -221,6 +223,7 @@ func handle_cancel():
 				hide_char_tiles()
 				update_character_phase(selected_character, character.Phases.Action)
 			character.Phases.AttackConfirm:
+				selected_character.set_direction(selected_char_original_direction)
 				update_character_phase(selected_character, character.Phases.AttackWeapon)
 
 func handle_attack():
@@ -304,6 +307,11 @@ func update_character_phase(character, new_state):
 		character.Phases.AttackConfirm:
 			selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
 			selected_char_attack_confirm.show()
+
+			# Rotate attacker towards the defender
+			selected_char_original_direction = selected_character.facing
+			var new_dir = character_dir.get_dir(selected_character.facing, attack_target.translation)
+			selected_character.set_direction(new_dir)
 
 			attack_context = attack_context_type.generate_context(selected_character, attack_target)
 

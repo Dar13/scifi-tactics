@@ -8,6 +8,7 @@ onready var character_mgr = load("res://assets/scripts/characters/character_mana
 const character_scene = preload("res://assets/scenes/character.tscn")
 const character_state = preload("res://assets/scripts/characters/character_state.gd")
 const character_class = preload("res://assets/scripts/characters/character.gd")
+const character_dir = preload("res://assets/scripts/characters/character_direction.gd")
 
 const weapon_scene = preload("res://assets/scenes/weapon.tscn")
 
@@ -32,7 +33,7 @@ func _ready():
 		state.character_class = character_state.Classes.BASIC
 		
 		var character = character_scene.instance()
-		character.init(state, test_positions[i], true, character_class.FaceDirection.North)
+		character.init(state, test_positions[i], true, character_dir.CharDirections.East)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		character.set_on_player_team()
 		
@@ -47,7 +48,7 @@ func _ready():
 		state.character_class = character_state.Classes.BASIC
 		
 		var character = character_scene.instance()
-		character.init(state, test_positions[i], true, character_class.FaceDirection.South)
+		character.init(state, test_positions[i], true, character_dir.CharDirections.West)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
 

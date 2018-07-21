@@ -64,18 +64,9 @@ func init(char_state, initial_position, initial_show, direction):
 		instance.show()
 	else:
 		instance.hide()
-
-	match direction:
-		FaceDirection.North:
-			pass
-		FaceDirection.East:
-			pass
-		FaceDirection.West:
-			pass
-		FaceDirection.South:
-			pass
-
+	
 	add_child(instance)
+	set_direction(direction)
 
 func add_equipment(item):
 	state.add_equipment(item)
@@ -104,6 +95,10 @@ func get_visual_bounds():
 func set_position(pos):
 	set_identity()
 	translate(pos)
+
+func set_direction(direction):
+	facing = direction
+	instance.set_direction(direction)
 
 func set_movement_space(cells):
 	movement_cells = cells
