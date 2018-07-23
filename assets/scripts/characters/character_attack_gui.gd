@@ -3,13 +3,15 @@ extends Control
 signal confirmed
 signal cancelled
 
-onready var cancel_attack_btn = get_node("cancel_attack_btn")
 onready var target_confirm_dlg = get_node("target_confirm_dlg")
+onready var cancel_attack_btn = get_node("cancel_attack_btn")
+
+onready var attack_selection_btn = get_node("target_confirm_dlg/VSplitContainer/attack_btn")
+onready var cancel_selection_btn = get_node("target_confirm_dlg/VSplitContainer/cancel_btn")
 
 func _ready():
-	target_confirm_dlg.add_item("Attack", 1)
-	target_confirm_dlg.add_item("Cancel", 2)
-	target_confirm_dlg.connect("id_pressed", self, "handle_selection")
+	attack_selection_btn.connect("pressed", self, "handle_attack_selection")
+	cancel_selection_btn.connect("pressed", self, "handle_cancel_selection")
 
 	cancel_attack_btn.connect("pressed", self, "handle_cancel_button")
 	pass
@@ -20,15 +22,15 @@ func selection_mode():
 
 func confirmation_mode(screen_coord):
 	cancel_attack_btn.hide()
-	target_confirm_dlg.popup(Rect2(screen_coord, Vector2(128, 64)))
 
-func handle_selection(selected_id):
-	if selected_id == 1:
-		emit_signal("confirmed")
-	else:
-		print("emit cancel (menu)")
-		emit_signal("cancelled")
+	target_confirm_dlg.rect_global_position = screen_coord
+	target_confirm_dlg.show()
+
+func handle_attack_selection():
+	emit_signal("confirmed")
+
+func handle_cancel_selection():
+	emit_signal("cancelled")
 
 func handle_cancel_button():
-	print("emit cancel (button)")
 	emit_signal("cancelled")
