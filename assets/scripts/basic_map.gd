@@ -114,6 +114,7 @@ func get_cells_in_range(world_pos, move_range, max_vertical):
 				contained.previous = cell
 				contained.distance = cell.distance + real_cost
 
+
 	return finished_cells
 
 func contains_cell(cell, container):

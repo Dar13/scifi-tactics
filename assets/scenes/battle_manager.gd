@@ -75,6 +75,14 @@ func _ready():
 	start_next_turn()
 	return
 
+# Assuming this is called after my children's are called...
+func _exit_tree():
+	for c in enemy_team.values():
+		c.free()
+
+	for c in player_team.values():
+		c.free()
+
 # Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
 func evaluate_battlefield():
 	var obstacles = []

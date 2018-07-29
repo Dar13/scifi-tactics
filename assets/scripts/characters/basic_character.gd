@@ -16,6 +16,9 @@ func _ready():
 	if character_mesh != null && character_mesh is MeshInstance:
 		character_mesh.set_surface_material(0, character_material)
 
+func _exit_tree():
+	pass
+
 func _process(delta):
 	# Called every frame. Delta is time since last frame.
 	pass

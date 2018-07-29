@@ -5,8 +5,11 @@ extends Node
 #
 # This persists between battles.
 
+const weapon_class = preload("res://assets/scripts/characters/weapon.gd")
+
 # Array of equipment on this character
 var inventory = []
+var active_weapon = null
 
 enum Classes {
 	BASIC = 0,
@@ -50,6 +53,11 @@ var expertise = 0			# Technical expertise of character, refer to GDD for effecte
 func _ready():
 	pass
 
+func destroy():
+	for i in inventory:
+		i.destroy()
+		i.free()
+
 # Should be called when creating the character, recreates character stats based on class and equipment
 # Relies on level being initialized already (TODO: pass it in?)
 func evaluate_initial_stats():
@@ -79,6 +87,15 @@ func evaluate_initial_stats():
 			print("unknown class, all your stats are zero!")
 	
 	# Now evaluate equipment (includes weapons)
+	evaluate_equipment()
+
+func evaluate_equipment():
+	# Determine active weapon
+	for e in inventory:
+		if e is weapon_class:
+			active_weapon = e
+			print("Setting active wep to %s" % e.get_name())
+
 
 # Called after every turn, used for temporary effects (ENG increment, turn-based increases to PWR/SKL/EPT/etc)
 func evaluate_turn_end():
@@ -93,5 +110,6 @@ func add_equipment(item):
 	if inventory.size() < 5:
 		inventory.push_back(item)
 		rv = true
-	
+		evaluate_equipment()
+
 	return rv

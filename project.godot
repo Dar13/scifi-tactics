@@ -14,6 +14,10 @@ config/name="Scifi-Tactics"
 run/main_scene="res://assets/scenes/test_map.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+global_state="*res://assets/scripts/global_state.gd"
+
 [display]
 
 window/size/width=1920

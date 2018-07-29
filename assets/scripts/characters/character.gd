@@ -30,6 +30,13 @@ var movement_path = []
 func _ready():
 	pass
 
+func _exit_tree():
+	if state:
+		state.destroy()
+
+	if instance:
+		instance.free()
+
 func _process(delta):
 	# Time to start movement, move towards the next path node at 1 m/s for now
 	if current_phase == Phases.MoveStart:

@@ -20,6 +20,10 @@ func init(name):
 		Name.BASIC:
 			instance = basic.instance()
 
+func destroy():
+	if instance:
+		instance.free()
+
 func get_attack_pattern(map_pos):
 	return instance.get_attack_pattern(map_pos)
 

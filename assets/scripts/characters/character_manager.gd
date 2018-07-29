@@ -92,6 +92,16 @@ func _ready():
 
 	return
 
+func _exit_tree():
+	for tile in character_move_tiles:
+		tile.free()
+
+	selected_char_menu.free()
+	selected_char_wep_menu.free()
+	selected_char_attack_confirm.free()
+	selected_char_attack_preview.free()
+	char_stats_menu.free()
+
 func _physics_process(delta):
 	# Called every physics timestep. Delta is time since last frame.
 	# Perform a raycast every timestep, used for mouse-over handling and will
