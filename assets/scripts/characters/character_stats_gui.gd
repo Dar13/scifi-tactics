@@ -1,6 +1,6 @@
 extends PopupPanel
 
-const character_class = preload("res://assets/scripts/characters/character.gd")
+var character_class = load("res://assets/scripts/characters/character.gd")
 
 onready var layout_root = get_node("./root")
 

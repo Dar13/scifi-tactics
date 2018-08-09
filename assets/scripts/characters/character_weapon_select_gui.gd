@@ -2,7 +2,7 @@ extends VBoxContainer
 
 signal weapon_selected
 
-const weapon_class = preload("res://assets/scripts/characters/weapon.gd")
+var weapon_class = load("res://assets/scripts/characters/weapon.gd")
 
 var selected_weapon = null
 onready var cancel_btn = get_node("cancel")

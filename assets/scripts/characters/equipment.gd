@@ -1,7 +1,7 @@
 extends Node
 
 # Base class for all equipment, as most equipment share certain characteristics
-const equip_state_class = preload("res://assets/scripts/equipment/equipment_state.gd")
+var equip_state_class = load("res://assets/scripts/equipment/equipment_state.gd")
 var equip_state = null
 
 func _ready():

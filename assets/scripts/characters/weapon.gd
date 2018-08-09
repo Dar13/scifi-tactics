@@ -2,8 +2,8 @@ extends "res://assets/scripts/characters/equipment.gd"
 
 # The various weapons
 # TODO: is there a better way to do this?
-const state_class = preload("res://assets/scripts/equipment/weapons/weapon_state.gd")
-const basic = preload("res://assets/models/equipment/basic_weapon/basic_weapon.tscn")
+var state_class = load("res://assets/scripts/equipment/weapons/weapon_state.gd")
+var basic = load("res://assets/models/equipment/basic_weapon/basic_weapon.tscn")
 
 # Weapon specialization of equipment
 enum Name {
@@ -15,6 +15,9 @@ var instance = null
 func _ready():
 	pass
 
+func _exit_tree():
+	destroy()
+
 func init(name):
 	match name:
 		Name.BASIC:
@@ -22,6 +25,7 @@ func init(name):
 
 func destroy():
 	if instance:
+		instance.destroy()
 		instance.free()
 
 func get_attack_pattern(map_pos):

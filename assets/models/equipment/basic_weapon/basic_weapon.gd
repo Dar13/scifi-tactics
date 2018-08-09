@@ -1,7 +1,7 @@
 extends Spatial
 
-const state_class = preload("res://assets/scripts/equipment/weapons/weapon_state.gd")
-const character = preload("res://assets/scripts/characters/character.gd")
+var state_class = load("res://assets/scripts/equipment/weapons/weapon_state.gd")
+var character = load("res://assets/scripts/characters/character.gd")
 
 var state = null
 var weapon_name = "Basic Weapon"
@@ -23,6 +23,13 @@ func _init():
 
 func _ready():
 	pass
+
+func _exit_tree():
+	destroy()
+
+func destroy():
+	if state:
+		state.free()
 
 func get_state():
 	return state

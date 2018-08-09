@@ -4,15 +4,15 @@ signal battlefield_updated
 signal turn_done
 
 var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
-const move_tile = preload("res://assets/scripts/move_tile.gd")
-const character = preload("res://assets/scripts/characters/character.gd")
-const character_dir = preload("res://assets/scripts/characters/character_direction.gd")
+var move_tile = load("res://assets/scripts/move_tile.gd")
+var character = load("res://assets/scripts/characters/character.gd")
+var character_dir = load("res://assets/scripts/characters/character_direction.gd")
 var character_stats_menu = load("res://assets/scenes/character_stats_gui.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
 var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
 var attack_preview_menu = load("res://assets/scenes/gui/character_attack_preview.tscn")
-const attack_context_type = preload("res://assets/scripts/battle/attack_context.gd")
+var attack_context_type = load("res://assets/scripts/battle/attack_context.gd")
 
 var battle_characters = {}
 var current_team = {}

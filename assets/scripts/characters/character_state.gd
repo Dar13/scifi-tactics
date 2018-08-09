@@ -5,7 +5,7 @@ extends Node
 #
 # This persists between battles.
 
-const weapon_class = preload("res://assets/scripts/characters/weapon.gd")
+var weapon_class = load("res://assets/scripts/characters/weapon.gd")
 
 # Array of equipment on this character
 var inventory = []

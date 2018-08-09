@@ -8,20 +8,20 @@ extends Spatial
 # battle-specific data in here
 
 enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, AttackConfirm, Use, Standby, Done }
-enum FaceDirection { North, South, East, West }
 onready var current_phase = Phases.Unselected
 
 signal update_phase(character, new_phase)
 
-const character_state = preload("res://assets/scripts/characters/character_state.gd")
+var character_state = load("res://assets/scripts/characters/character_state.gd")
+var character_direction = load("res://assets/scripts/characters/character_direction.gd")
 var state = null
 
-const class_instances = {
-	character_state.Classes.BASIC : preload("res://assets/models/characters/basic_character.tscn"),
+var class_instances = {
+	character_state.Classes.BASIC : load("res://assets/models/characters/basic_character.tscn"),
 }
 
 var instance = null
-var facing = FaceDirection.North
+var facing = character_direction.CharDirections.North
 
 # Movement information
 var movement_cells = []

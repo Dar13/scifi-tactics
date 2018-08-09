@@ -5,12 +5,12 @@ onready var camera = get_viewport().get_camera()
 onready var map = get_node("../map_root")
 
 onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
-const character_scene = preload("res://assets/scenes/character.tscn")
-const character_state = preload("res://assets/scripts/characters/character_state.gd")
-const character_class = preload("res://assets/scripts/characters/character.gd")
-const character_dir = preload("res://assets/scripts/characters/character_direction.gd")
+var character_scene = load("res://assets/scenes/character.tscn")
+var character_state = load("res://assets/scripts/characters/character_state.gd")
+var character_class = load("res://assets/scripts/characters/character.gd")
+var character_dir = load("res://assets/scripts/characters/character_direction.gd")
 
-const weapon_scene = preload("res://assets/scenes/weapon.tscn")
+var weapon_scene = load("res://assets/scenes/weapon.tscn")
 
 var current_team = null
 var player_team = {}
@@ -77,6 +77,9 @@ func _ready():
 
 # Assuming this is called after my children's are called...
 func _exit_tree():
+	if character_mgr:
+		character_mgr.free()
+
 	for c in enemy_team.values():
 		c.free()
 

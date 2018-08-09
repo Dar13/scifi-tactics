@@ -3,8 +3,8 @@ extends KinematicBody
 # This is the root of the 'instance' of a character,
 # managing the visual and physics aspects of a character
 
-const character_class = preload("res://assets/scripts/characters/character.gd")
-const character_direction = preload("res://assets/scripts/characters/character_direction.gd")
+var character_class = load("res://assets/scripts/characters/character.gd")
+var character_direction = load("res://assets/scripts/characters/character_direction.gd")
 var base_color = Color(1.0, 0.0, 0.0, 1.0)
 var character_material = null
 # 'character_root' == self
