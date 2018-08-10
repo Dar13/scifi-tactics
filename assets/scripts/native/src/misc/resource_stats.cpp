@@ -11,7 +11,6 @@ void resource_stats::_register_methods() {
     register_method((char*)"_enter_tree", &resource_stats::_enter_tree);
     register_method((char*)"_exit_tree", &resource_stats::_exit_tree);
     register_method((char*)"_notification", &resource_stats::_notification);
-    register_method((char*)"get_test_property", &resource_stats::get_test_property);
 }
 
 resource_stats::resource_stats() { }
@@ -48,8 +47,4 @@ void resource_stats::print_stats(const char *phase) {
     Godot::print(" - Object count = {0}", object_count);
     Godot::print(" - Static memory = {0}", static_mem);
     Godot::print(" - Dynamic memory = {0}", dyn_mem);
-}
-
-Variant resource_stats::get_test_property() const {
-    return test_property;
 }
