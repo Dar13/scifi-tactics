@@ -49,6 +49,10 @@ func _process(delta):
 
 			var direction = (target_world_pos - self.translation)
 
+			# Rotate towards target
+			var new_dir = character_direction.look_at(self.translation, target_world_pos)
+			set_direction(new_dir)
+
 			direction = (direction.normalized() * 2) * delta
 			translate(direction)
 

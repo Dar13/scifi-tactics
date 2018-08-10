@@ -320,7 +320,7 @@ func update_character_phase(character, new_state):
 
 			# Rotate attacker towards the defender
 			selected_char_original_direction = selected_character.facing
-			var new_dir = character_dir.get_dir(selected_character.facing, attack_target.translation - selected_character.translation)
+			var new_dir = character_dir.look_at(selected_character.translation, attack_target.translation)
 			selected_character.set_direction(new_dir)
 
 			attack_context = attack_context_type.generate_context(selected_character, attack_target)

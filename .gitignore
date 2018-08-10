@@ -9,3 +9,8 @@
 *.material
 *.dae
 .import/
+*.import
+
+# Build artifacts
+*.os
+assets/scripts/native/bin/

@@ -1,9 +1,10 @@
 # North -> +X, South -> -X, East -> -Z, West -> +Z
 enum CharDirections { North = 0, South = 1, East = 2, West = 3 }
 
+# These are absolute directions/normals
 const directions = {
-	CharDirections.North : {"angle": PI * 1.5, "normal": Vector3(1, 0, 0) },
-	CharDirections.South : {"angle": PI * 0.5, "normal": Vector3(-1, 0, 0) },
+	CharDirections.North : {"angle": PI * 1.5, "normal": Vector3(-1, 0, 0) },
+	CharDirections.South : {"angle": PI * 0.5, "normal": Vector3(1, 0, 0) },
 	CharDirections.East : {"angle": 0.0, "normal": Vector3(0, 0, -1) },
 	CharDirections.West : {"angle": PI, "normal" : Vector3(0, 0, 1) }
 }
@@ -15,27 +16,37 @@ static func get_abs_rotation(dir):
 static func get_abs_normal(dir):
 	return directions[dir]["normal"]
 
-static func get_dir(base_dir, target_point):
-	# This is a 2D rotation at the end of the day
-	target_point.y = 0
+# Returns the appropriate CharacterDirection to use to 'look'
+# at the target position. Both coordinates should be in world
+# space.
+static func look_at(current_pos, target_pos):
+	# Convert into 2D coordinate (X,Z)
+	current_pos.y = 0
+	target_pos.y = 0
 
-	var curr = get_abs_normal(base_dir)
-	var tgt = target_point.normalized()
-	var angle = acos(curr.dot(tgt))
+	var diff = target_pos - current_pos
+	diff = diff.normalized()
+	var abs_v = diff.abs()
 
-	angle = angle / PI 		# Get rid of PI
-	angle = round(angle * 2) / 2	# Clamp value to some multiple of 0.5
-	angle = angle * PI		# Convert to radians
-	angle = fmod(angle, TAU)	# Make sure we're in 0 -> 2PI range
+	var s = Vector3(0, 0, 0)
+	if abs_v.x != 0.0: s.x = diff.x / abs_v.x
+	if abs_v.y != 0.0: s.y = diff.y / abs_v.y
+	if abs_v.z != 0.0: s.z = diff.z / abs_v.z
 
-	if angle == directions[CharDirections.North]["angle"]:
-		return CharDirections.North
-	elif angle == directions[CharDirections.South]["angle"]:
-		return CharDirections.South
-	elif angle == directions[CharDirections.East]["angle"]:
-		return CharDirections.East
-	elif angle == directions[CharDirections.West]["angle"]:
-		return CharDirections.West
+	var axis = abs_v.max_axis()
+	var v = Vector3(0,0,0)
+	if axis == Vector3.AXIS_X:
+		v = Vector3(1, 0, 0)
+	elif axis == Vector3.AXIS_Y:
+		v = Vector3(0, 1, 0)
 	else:
-		print("Invalid direction found, angle = %s" % angle)
-		return CharDirections.North
+		v = Vector3(0, 0, 1)
+	
+	v = v * s
+	#print("T %s - C %s = N %s, Final: %s" % [target_pos, current_pos, diff, v])
+	for d in directions.keys():
+		if directions[d]["normal"] == v:
+			return d
+	
+	print("Unable to find direction! v = %s" % v)
+	return CharDirections.North
