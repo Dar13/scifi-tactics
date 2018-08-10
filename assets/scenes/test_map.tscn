@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://assets/scripts/end_stats.gdns" type="Script" id=1]
+[ext_resource path="res://assets/scripts/native/def/resource_stats.gdns" type="Script" id=1]
 [ext_resource path="res://assets/scenes/basic_map.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/scripts/basic_map.gd" type="Script" id=3]
 [ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=4]
