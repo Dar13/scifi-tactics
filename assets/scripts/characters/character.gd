@@ -48,19 +48,20 @@ func _process(delta):
 			target_world_pos.y += 2
 
 			var direction = (target_world_pos - self.translation)
-
-			# Rotate towards target
-			var new_dir = character_direction.look_at(self.translation, target_world_pos)
-			set_direction(new_dir)
-
 			direction = (direction.normalized() * 2) * delta
 			translate(direction)
 
 			var distance = self.translation.distance_to(target_world_pos)
-			# Snap to the final solution if we're close enough
+			# Snap to the final position if we're close enough
 			if distance <= 0.01:
 				set_position(target_world_pos)
 				movement_path.pop_front()
+				# Rotate towards new target
+				if !movement_path.empty():
+					target_world_pos = movement_path.front().world_position
+					target_world_pos.y += 2
+					var new_dir = character_direction.look_at(self.translation, target_world_pos)
+					set_direction(new_dir)
 
 func init(char_state, initial_position, initial_show, direction):
 	state = char_state

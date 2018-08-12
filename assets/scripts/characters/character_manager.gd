@@ -157,6 +157,7 @@ func select_character(ch):
 	if ch.current_phase != character.Phases.Done:
 		selected_character = ch
 		selected_character.select()
+		selected_char_original_direction = selected_character.facing
 		
 		camera.center_around_point(selected_character.translation, camera.SPEED_LO)
 
@@ -257,6 +258,7 @@ func handle_selected_weapon():
 func restore_original():
 	if selected_character && selected_char_original_pos:
 		selected_character.set_position(selected_char_original_pos)
+		selected_character.set_direction(selected_char_original_direction)
 		camera.center_around_point(selected_char_original_pos, camera.SPEED_LO)
 		selected_char_original_pos = null
 
