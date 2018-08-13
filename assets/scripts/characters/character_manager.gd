@@ -10,6 +10,7 @@ var character_dir = load("res://assets/scripts/characters/character_direction.gd
 var character_stats_menu = load("res://assets/scenes/character_stats_gui.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
+var character_direction_arrows = load("res://assets/models/characters/character_direction_arrow/character_dir_arrows.tscn")
 var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
 var attack_preview_menu = load("res://assets/scenes/gui/character_attack_preview.tscn")
 var attack_context_type = load("res://assets/scripts/battle/attack_context.gd")
@@ -30,7 +31,7 @@ var attack_context = null
 
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 onready var selected_char_attack_preview = attack_preview_menu.instance()
-
+onready var char_dir_arrows = character_direction_arrows.instance()
 onready var char_stats_menu = character_stats_menu.instance()
 
 onready var camera = get_viewport().get_camera()
@@ -90,6 +91,11 @@ func _ready():
 	char_stats_menu.visible = false
 	add_child(char_stats_menu)
 
+	add_child(char_dir_arrows)
+	char_dir_arrows.hide()
+	char_dir_arrows.connect("cancelled", self, "handle_cancel")
+	char_dir_arrows.connect("confirmed", self, "handle_standby_confirmed")
+
 	return
 
 func _exit_tree():
@@ -134,6 +140,10 @@ func _physics_process(delta):
 					# Ensure the collider is a character (or part of the map??, haven't decided)
 					if collider_parent is character:
 						mouse_over_last = collider_parent
+
+				# Check against the character direction arrows for highlighting purposes
+				if char_dir_arrows.is_visible():
+					char_dir_arrows.highlight_arrow(collider_parent)
 	return
 
 func _unhandled_input(event):
@@ -220,8 +230,12 @@ func handle_click(object):
 						character.Phases.AttackWeapon:
 							attack_target = parent
 							update_character_phase(selected_character, character.Phases.AttackConfirm)
+		elif char_dir_arrows.select_arrow(parent):
+			# Nothing further needed here, response to this is handled in the signal
+			# handler. However, wanted to keep the logic flow consistent here.
+			pass	
 		else:
-			print("clicked was on the map")
+			print("clicked was unhandled (potentially the map)")
 	return
 
 func handle_cancel():
@@ -236,6 +250,9 @@ func handle_cancel():
 			character.Phases.AttackConfirm:
 				selected_character.set_direction(selected_char_original_direction)
 				update_character_phase(selected_character, character.Phases.AttackWeapon)
+			character.Phases.StandbyFacing:
+				char_dir_arrows.hide()
+				update_character_phase(selected_character, character.Phases.Action)
 
 func handle_attack():
 	if selected_character:
@@ -262,9 +279,14 @@ func restore_original():
 		camera.center_around_point(selected_char_original_pos, camera.SPEED_LO)
 		selected_char_original_pos = null
 
+func handle_standby_confirmed():
+	char_dir_arrows.hide()
+	selected_character.set_direction(char_dir_arrows.selected_direction)
+	update_character_phase(selected_character, character.Phases.Done)
+
 func handle_standby():
 	if selected_character:
-		update_character_phase(selected_character, character.Phases.Done)
+		update_character_phase(selected_character, character.Phases.StandbyFacing)
 
 func update_character_phase(character, new_state):
 	if character == null:
@@ -329,6 +351,10 @@ func update_character_phase(character, new_state):
 
 			selected_char_attack_preview.populate(attack_context)
 			selected_char_attack_preview.show()
+
+		character.Phases.StandbyFacing:
+			char_dir_arrows.set_position(character.translation)
+			char_dir_arrows.show()
 
 		character.Phases.Done:
 			emit_signal("battlefield_updated")

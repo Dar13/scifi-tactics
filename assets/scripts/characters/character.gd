@@ -7,7 +7,7 @@ extends Spatial
 # This is only relevant in the context of a battle, and there are
 # battle-specific data in here
 
-enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, AttackConfirm, Use, Standby, Done }
+enum Phases { Unselected, Selected, MoveStart, MoveEnd, Action, AttackWeapon, AttackAbility, AttackConfirm, Use, Standby, StandbyFacing, Done }
 onready var current_phase = Phases.Unselected
 
 signal update_phase(character, new_phase)
@@ -17,7 +17,7 @@ var character_direction = load("res://assets/scripts/characters/character_direct
 var state = null
 
 var class_instances = {
-	character_state.Classes.BASIC : load("res://assets/models/characters/basic_character.tscn"),
+	character_state.Classes.BASIC : load("res://assets/models/characters/basic_character/basic_character.tscn"),
 }
 
 var instance = null
