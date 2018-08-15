@@ -235,7 +235,7 @@ func handle_click(object):
 			# handler. However, wanted to keep the logic flow consistent here.
 			pass	
 		else:
-			print("clicked was unhandled (potentially the map)")
+			print("clicked was unhandled (potentially the map) Collider = %s" % parent)
 	return
 
 func handle_cancel():

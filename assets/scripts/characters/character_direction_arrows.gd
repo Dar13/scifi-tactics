@@ -26,12 +26,17 @@ func _ready():
 func hide():
 	ui.hide()
 	arrows.hide()
-	# TODO: Disable physics/raycasting?
+	# Disable physics on collision shapes as well
+	for i in arrows.get_children():
+		var n = i.find_node("col_shape")
+		n.disabled = true
 
 func show():
 	ui.show()
 	arrows.show()
-	# TODO: Enable physics/raycasting?
+	for i in arrows.get_children():
+		var n = i.find_node("col_shape")
+		n.disabled = false
 
 func is_visible():
 	return arrows.visible
