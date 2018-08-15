@@ -27,6 +27,9 @@ var facing = character_direction.CharDirections.North
 var movement_cells = []
 var movement_path = []
 
+# Private vars (Don't use these unless you're in a method)
+var _oriented = false
+
 func _ready():
 	pass
 
@@ -44,6 +47,14 @@ func _process(delta):
 			emit_signal("update_phase", self, Phases.MoveEnd)
 			emit_signal("update_phase", self, Phases.Action)
 		else:
+			# Rotate towards new target
+			if _oriented == false:
+				_oriented = true
+				var tgt = movement_path.front().world_position
+				tgt.y += 2
+				var new_dir = character_direction.look_at(self.translation, tgt)
+				set_direction(new_dir)
+
 			var target_world_pos = movement_path.front().world_position
 			target_world_pos.y += 2
 
@@ -51,17 +62,12 @@ func _process(delta):
 			direction = (direction.normalized() * 2) * delta
 			translate(direction)
 
-			var distance = self.translation.distance_to(target_world_pos)
 			# Snap to the final position if we're close enough
+			var distance = self.translation.distance_to(target_world_pos)
 			if distance <= 0.01:
 				set_position(target_world_pos)
 				movement_path.pop_front()
-				# Rotate towards new target
-				if !movement_path.empty():
-					target_world_pos = movement_path.front().world_position
-					target_world_pos.y += 2
-					var new_dir = character_direction.look_at(self.translation, target_world_pos)
-					set_direction(new_dir)
+				_oriented = false
 
 func init(char_state, initial_position, initial_show, direction):
 	state = char_state
