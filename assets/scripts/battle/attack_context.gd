@@ -13,9 +13,12 @@ static func generate_context(atk_char, def_char):
 
 	# TODO: Properly calculate hit chances and damage for attacker
 
+	var atk_phys_dmg = atk_char.state.phys_attack_power - 0	# TODO: Get defender's phys defense stat
+	var atk_tech_dmg = atk_char.state.tech_attack_power - 0	# TODO: Get defender's tech defense stat
+
 	ctx.attacker = atk_char
 	ctx.attacker_info = {"name": "Darius",
-			"damage": 5,
+			"damage": atk_phys_dmg + atk_tech_dmg,
 			"health": ctx.attacker.state.health,
 			"health_max": ctx.attacker.state.max_health,
 			"energy": ctx.attacker.state.energy,
@@ -35,7 +38,10 @@ static func generate_context(atk_char, def_char):
 
 	# TODO: Properly calculate hit chances and damage for defender's counter-attack
 	if counter_possible:
-		ctx.defender_info["damage"] = 3
+		var def_phys_dmg = def_char.state.phys_attack_power - 0 # TODO: Get attacker's phys defense stat
+		var def_tech_dmg = def_char.state.tech_attack_power - 0 # TODO: Get attacker's tech defense stat
+
+		ctx.defender_info["damage"] = def_phys_dmg + def_tech_dmg
 		ctx.defender_info["hit_chance"] = 100.0
 	else:
 		ctx.defender_info["damage"] = 0

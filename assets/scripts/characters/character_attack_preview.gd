@@ -20,7 +20,7 @@ func _ready():
 	hide()
 
 func populate(context):
-	if(context.defender_info["damage"] != -1):
+	if(context.defender_info["damage"] > 0):
 		counter_atk_indicator.show()
 
 	atk_name.text = context.attacker_info["name"]

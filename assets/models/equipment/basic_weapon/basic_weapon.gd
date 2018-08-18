@@ -10,13 +10,14 @@ var thumbnail = null
 func _init():
 	state = state_class.new()
 	
-	state.attack_power = 2
 	state.attack_range = 1
-	
-	state.defense_power = 1
+	state.defense_power = 0
+
+	state.phys_attack_power = 2
+	state.tech_attack_power = 0
 	
 	# If weapon boosts anything held in equipment_state, set it here
-	state.tech_boost = 1
+	state.tech_boost = 0
 	
 	thumbnail = ImageTexture.new()
 	thumbnail.load("res://assets/gui/placeholder_black.png")

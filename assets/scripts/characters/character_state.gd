@@ -50,6 +50,12 @@ var power = 0				# Physical power/might of character, refer to GDD for effected 
 var skill = 0				# Skill and speed of character, refer to GDD for effected attributes
 var expertise = 0			# Technical expertise of character, refer to GDD for effected attributes
 
+var base_phys_attack = 0	# A base value for physical attacks, this varies depending on the class. Is the equivalent of attacking with fists
+var base_tech_attack = 0	# A base value for physical attacks, this varies depending on the class. Is the equivalent of attacking with fists
+
+var phys_attack_power = 0	# This is a dynamically-calculated value, based on the character's PWR and equipment/weapons
+var tech_attack_power = 0	# This is a dynamically-calculated value, based on the character's EPT and equipment/weapons
+
 func _ready():
 	pass
 
@@ -83,6 +89,9 @@ func evaluate_initial_stats():
 			power = (level * 4)
 			skill = (level * 3)
 			expertise = (level * 2)
+
+			base_phys_attack = 1
+			base_tech_attack = 0
 		_:
 			print("unknown class, all your stats are zero!")
 	
@@ -90,11 +99,37 @@ func evaluate_initial_stats():
 	evaluate_equipment()
 
 func evaluate_equipment():
-	# Determine active weapon
+	var phys_atk_contrib = base_phys_attack
+	var tech_atk_contrib = base_tech_attack
+
+	# Reset these two to their base values
+	phys_attack_power = power
+	tech_attack_power = expertise
+
+	# Determine:
+	#	* active weapon (if null)
+	#	* character attack power
+	#	* equipment defense bonus
 	for e in inventory:
 		if e is weapon_class:
-			active_weapon = e
-			print("Setting active wep to %s" % e.get_name())
+			if active_weapon == null:
+				active_weapon = e
+				print("Setting active wep to %s" % e.get_name())
+
+			if active_weapon == e:
+				phys_atk_contrib = active_weapon.get_state().phys_attack_power
+				tech_atk_contrib = active_weapon.get_state().tech_attack_power
+		# TODO: `elif e is equipment_class:`
+
+	if phys_atk_contrib > 0:
+		phys_attack_power += phys_atk_contrib
+	else:
+		phys_attack_power = 0
+
+	if tech_atk_contrib > 0:
+		tech_attack_power += tech_atk_contrib
+	else:
+		tech_attack_power = 0
 
 
 # Called after every turn, used for temporary effects (ENG increment, turn-based increases to PWR/SKL/EPT/etc)
@@ -113,3 +148,12 @@ func add_equipment(item):
 		evaluate_equipment()
 
 	return rv
+
+func set_active_weapon(wep):
+	var idx = inventory.find(wep)
+	if idx == -1:
+		print("Invalid weapon (%s) given to %s as active weapon!" % [wep, self])
+	else:
+		active_weapon = wep	# TODO: Or `active_weapon = inventory[idx]`?
+	
+	evaluate_equipment()
