@@ -11,7 +11,6 @@ func _init():
 	state = state_class.new()
 	
 	state.attack_range = 1
-	state.defense_power = 0
 
 	state.phys_attack_power = 2
 	state.tech_attack_power = 0

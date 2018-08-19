@@ -6,6 +6,7 @@ extends Node
 # This persists between battles.
 
 var weapon_class = load("res://assets/scripts/characters/weapon.gd")
+var equip_class = load("res://assets/scripts/characters/equipment.gd")
 
 # Array of equipment on this character
 var inventory = []
@@ -53,8 +54,12 @@ var expertise = 0			# Technical expertise of character, refer to GDD for effecte
 var base_phys_attack = 0	# A base value for physical attacks, this varies depending on the class. Is the equivalent of attacking with fists
 var base_tech_attack = 0	# A base value for physical attacks, this varies depending on the class. Is the equivalent of attacking with fists
 
-var phys_attack_power = 0	# This is a dynamically-calculated value, based on the character's PWR and equipment/weapons
-var tech_attack_power = 0	# This is a dynamically-calculated value, based on the character's EPT and equipment/weapons
+# Evaluated stats, a combination of base character stats and equipment values
+var phys_attack_power = 0	# Raw physical attack power after applying weapon effects
+var tech_attack_power = 0	# Raw technological attack power after applying weapon effects
+
+var phys_defense_power = 0
+var tech_defense_power = 0
 
 func _ready():
 	pass
@@ -102,9 +107,12 @@ func evaluate_equipment():
 	var phys_atk_contrib = base_phys_attack
 	var tech_atk_contrib = base_tech_attack
 
-	# Reset these two to their base values
+	# Reset these to their base values
 	phys_attack_power = power
 	tech_attack_power = expertise
+
+	phys_defense_power = armor
+	tech_attack_power = disruption
 
 	# Determine:
 	#	* active weapon (if null)
@@ -119,7 +127,9 @@ func evaluate_equipment():
 			if active_weapon == e:
 				phys_atk_contrib = active_weapon.get_state().phys_attack_power
 				tech_atk_contrib = active_weapon.get_state().tech_attack_power
-		# TODO: `elif e is equipment_class:`
+		elif e is equip_class:
+			phys_defense_power += e.armor_value
+			tech_defense_power += e.disruption_value
 
 	if phys_atk_contrib > 0:
 		phys_attack_power += phys_atk_contrib

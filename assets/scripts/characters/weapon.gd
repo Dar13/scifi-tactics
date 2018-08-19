@@ -7,8 +7,6 @@ var weapon_instances = {
 	wep_state.Names.BASIC : load("res://assets/models/equipment/basic_weapon/basic_weapon.tscn")
 }
 
-var instance = null
-
 func _ready():
 	pass
 

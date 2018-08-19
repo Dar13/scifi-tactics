@@ -21,13 +21,6 @@ var tech_attack_power = 0
 # The range of the basic attack of this weapon
 var attack_range = 0
 
-# TODO: These might need to be promoted into equipment_state...
-# The amount of armor provided by this weapon
-var armor_value = 0
-
-# The amount of disruption provided by this weapon
-var disruption_value = 0
-
 func _init():
 	._init()
 

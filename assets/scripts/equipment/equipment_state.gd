@@ -4,8 +4,13 @@ var power_boost = 0
 var skill_boost = 0
 var expertise_boost = 0
 var stealth_boost = 0
-var armor_boost = 0
 var tech_boost = 0
+
+# The amount of armor provided by this piece of equipment
+var armor_value = 0
+
+# The amount of disruption provided by this piece of equipment
+var disruption_value = 0
 
 var physical_dodge_boost = 0
 var physical_hit_boost = 0
