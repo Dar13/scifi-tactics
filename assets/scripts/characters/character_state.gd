@@ -128,8 +128,8 @@ func evaluate_equipment():
 				phys_atk_contrib = active_weapon.get_state().phys_attack_power
 				tech_atk_contrib = active_weapon.get_state().tech_attack_power
 		elif e is equip_class:
-			phys_defense_power += e.armor_value
-			tech_defense_power += e.disruption_value
+			phys_defense_power += e.get_state().armor_value
+			tech_defense_power += e.get_state().disruption_value
 
 	if phys_atk_contrib > 0:
 		phys_attack_power += phys_atk_contrib

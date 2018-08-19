@@ -1,5 +1,9 @@
 extends Node
 
+enum EquipNames {
+	BASIC_HAT,
+}
+
 var power_boost = 0
 var skill_boost = 0
 var expertise_boost = 0

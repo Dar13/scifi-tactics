@@ -13,6 +13,9 @@ var character_dir = load("res://assets/scripts/characters/character_direction.gd
 var weapon_scene = load("res://assets/scenes/weapon.tscn")
 var weapon_state = load("res://assets/scripts/equipment/weapons/weapon_state.gd")
 
+var equipment_scene = load("res://assets/scenes/equipment.tscn")
+var equipment_state = load("res://assets/scripts/equipment/equipment_state.gd")
+
 var current_team = null
 var player_team = {}
 var enemy_team = {}
@@ -67,9 +70,14 @@ func _ready():
 
 	# Pick first player character for a weapon's test
 	var test_wep = weapon_scene.instance()
-	test_wep.init(weapon_state.Names.BASIC)
+	test_wep.init(weapon_state.WeaponNames.BASIC)
 	var test_ch = player_team.values()[0]
 	test_ch.add_equipment(test_wep)
+
+	# Add a hat...
+	var test_hat = equipment_scene.instance()
+	test_hat.init(equipment_state.EquipNames.BASIC_HAT)
+	test_ch.add_equipment(test_hat)
 	
 	# Player team starts the battle
 	current_team = player_team

@@ -8,7 +8,7 @@ enum Types {
 }
 
 # TODO: Do we need to correlate these to a type?
-enum Names {
+enum WeaponNames {
 	BASIC,
 }
 

@@ -4,7 +4,7 @@ extends "res://assets/scripts/characters/equipment.gd"
 # TODO: is there a better way to do this?
 var wep_state = load("res://assets/scripts/equipment/weapons/weapon_state.gd")
 var weapon_instances = {
-	wep_state.Names.BASIC : load("res://assets/models/equipment/basic_weapon/basic_weapon.tscn")
+	wep_state.WeaponNames.BASIC : load("res://assets/models/equipment/basic_weapon/basic_weapon.tscn")
 }
 
 func _ready():
