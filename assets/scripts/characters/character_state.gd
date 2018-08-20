@@ -156,7 +156,7 @@ func add_equipment(item):
 		inventory.push_back(item)
 		rv = true
 		evaluate_equipment()
-
+	
 	return rv
 
 func set_active_weapon(wep):

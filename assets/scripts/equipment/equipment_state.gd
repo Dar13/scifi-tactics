@@ -2,6 +2,7 @@ extends Node
 
 enum EquipNames {
 	BASIC_HAT,
+	BASIC_VEST,
 }
 
 var power_boost = 0

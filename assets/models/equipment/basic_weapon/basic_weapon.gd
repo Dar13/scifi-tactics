@@ -1,15 +1,8 @@
-extends Spatial
-
-var state_class = load("res://assets/scripts/equipment/weapons/weapon_state.gd")
-var character = load("res://assets/scripts/characters/character.gd")
-
-var state = null
-var weapon_name = "Basic Weapon"
-var thumbnail = null
+extends "res://assets/models/equipment/weapon_base.gd"
 
 func _init():
-	state = state_class.new()
-	
+	e_name = "Basic Weapon"
+
 	state.attack_range = 1
 
 	state.phys_attack_power = 2
@@ -18,21 +11,13 @@ func _init():
 	# If weapon boosts anything held in equipment_state, set it here
 	state.tech_boost = 0
 	
-	thumbnail = ImageTexture.new()
-	thumbnail.load("res://assets/gui/placeholder_black.png")
+	setup_thumbnail("res://assets/gui/placeholder_black.png")
 
 func _ready():
 	pass
 
 func _exit_tree():
 	destroy()
-
-func destroy():
-	if state:
-		state.free()
-
-func get_state():
-	return state
 
 func get_attack_pattern(map_pos):
 	var pattern = [map_pos + Vector3(1, 0, 0), map_pos + Vector3(-1, 0, 0),

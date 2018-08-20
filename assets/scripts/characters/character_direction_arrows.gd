@@ -20,8 +20,6 @@ func _ready():
 		if c.name == "west_arrow": dir = char_dir.CharDirections.West
 		if c.name == "east_arrow": dir = char_dir.CharDirections.East
 		direction_arrows[c.name] = dir
-	
-	print(direction_arrows)
 
 func hide():
 	ui.hide()

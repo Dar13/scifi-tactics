@@ -33,7 +33,7 @@ func do_attack(object):
 	return instance.do_attack(object)
 
 func get_name():
-	return instance.weapon_name
+	return instance.e_name
 
 func get_thumbnail():
 	return instance.thumbnail

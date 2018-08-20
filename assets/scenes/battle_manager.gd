@@ -78,6 +78,11 @@ func _ready():
 	var test_hat = equipment_scene.instance()
 	test_hat.init(equipment_state.EquipNames.BASIC_HAT)
 	test_ch.add_equipment(test_hat)
+
+	# And a vest
+	var test_vest = equipment_scene.instance()
+	test_vest.init(equipment_state.EquipNames.BASIC_VEST)
+	test_ch.add_equipment(test_vest)
 	
 	# Player team starts the battle
 	current_team = player_team
