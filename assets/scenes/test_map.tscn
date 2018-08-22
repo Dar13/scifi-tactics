@@ -2,11 +2,11 @@
 
 [ext_resource path="res://assets/scripts/native/def/resource_stats.gdns" type="Script" id=1]
 [ext_resource path="res://assets/scenes/basic_map.tscn" type="PackedScene" id=2]
-[ext_resource path="res://assets/scripts/basic_map.gd" type="Script" id=3]
+[ext_resource path="res://assets/scripts/maps/basic_map.gd" type="Script" id=3]
 [ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=4]
 [ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=5]
 
-[node name="root" type="Node"]
+[node name="root" type="Node" index="0"]
 
 script = ExtResource( 1 )
 
@@ -31,7 +31,7 @@ omni_range = 18.0115
 omni_attenuation = 1.0
 omni_shadow_mode = 1
 omni_shadow_detail = 1
-_sections_unfolded = [ "Omni", "Shadow", "Transform" ]
+_sections_unfolded = [ "Editor", "Light", "Omni", "Shadow", "Transform" ]
 
 [node name="test_camera" type="Camera" parent="." index="1"]
 
