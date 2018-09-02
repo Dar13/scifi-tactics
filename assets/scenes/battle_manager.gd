@@ -4,8 +4,6 @@ extends Node
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../map_root")
 
-var map_base = load("res://assets/scripts/maps/map_base.gd")
-
 onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
 var character_scene = load("res://assets/scenes/character.tscn")
 var character_state = load("res://assets/scripts/characters/character_state.gd")

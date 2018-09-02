@@ -1,8 +1,14 @@
 extends Spatial
 
-onready var grid = get_node("map_grid")
+var tile_class = load("res://assets/scripts/maps/tile.gd")
 
+onready var grid = get_node("grid")
+
+# Key is Vector2(X,Z) coordinate, Value is [Tile, Vector3]
+const GRID_TILE = 0
+const GRID_POS = 1
 var grid_graph = {}
+
 var grid_min = Vector3(100, 100, 100)
 var grid_max = Vector3(-100, -100, -100)
 
@@ -42,7 +48,8 @@ func _ready():
 				if is_pos_in_grid(Vector3(x, y, z)) == true:
 					highest_y = y
 
-			grid_graph[Vector2(x, z)] = Vector3(x, highest_y, z)
+			var tile = tile_class.new(grid.get_cell_item(x, highest_y, z))
+			grid_graph[Vector2(x, z)] = [tile, Vector3(x, highest_y, z)]
 
 	pass
 
@@ -50,6 +57,12 @@ func _ready():
 #	# Called every frame. Delta is time since last frame.
 #	# Update game logic here.
 #	pass
+
+func set_tile_status(tile_pos, new_status):
+	var top_level = is_pos_top_level(tile_pos)
+	if top_level[TOP_RESULT] == true:
+		var tile = grid_graph[top_level[TOP_KEY]][GRID_TILE]
+		tile.set_status(new_status)
 
 func set_obstacles(arr):
 	# This is a bit paranoid, but may need to iterate over this
@@ -63,7 +76,7 @@ func set_obstacles(arr):
 func get_cell_height_if_exists(map_pos):
 	var xz = Vector2(map_pos.x, map_pos.z)
 	if grid_graph.has(xz):
-		return grid_graph[xz].y
+		return grid_graph[xz][GRID_POS].y
 
 	return null
 
@@ -73,10 +86,10 @@ func get_neighbors(map_pos, max_vertical):
 		var tmp = map_pos + dir
 		# Working around not having tuples/other niceties
 		var res = is_pos_top_level(tmp)
-		if res.front() == false:
+		if res[TOP_RESULT] == false:
 			continue
 
-		tmp = res.back()
+		tmp = res[TOP_POS]
 		var vert_dist = map_pos.y - tmp.y
 		if vert_dist <= max_vertical && obstacles.find(tmp) == -1:
 			neighbors.append(MapCell.new(tmp, get_world_coords(tmp), null, 0))
@@ -138,13 +151,19 @@ func contains_cell(cell, container):
 
 	return null
 
+# Checks if 3D position is the top-level position
+# Returns: [Boolean, 2D key, 3D Position]
+# Note: If Boolean == false, other elements aren't valid
+const TOP_RESULT = 0
+const TOP_KEY = 1
+const TOP_POS = 2
 func is_pos_top_level(pos):
 	var v2 = Vector2(pos.x, pos.z)
 	var res = []
 	if grid_graph.has(v2):
-		res = [true, grid_graph[v2]]
+		res = [true, v2, grid_graph[v2][GRID_POS]]
 	else:
-		res = [false, null]
+		res = [false, null, null]
 
 	return res
 

@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://assets/scripts/native/def/resource_stats.gdns" type="Script" id=1]
 [ext_resource path="res://assets/scenes/basic_map.tscn" type="PackedScene" id=2]
-[ext_resource path="res://assets/scripts/maps/map_base.gd" type="Script" id=3]
-[ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=4]
-[ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=5]
+[ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=3]
+[ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=4]
 
 [node name="root" type="Node" index="0"]
 
@@ -52,15 +51,14 @@ _sections_unfolded = [ "Transform" ]
 
 [node name="map_root" parent="." index="2" instance=ExtResource( 2 )]
 
-script = ExtResource( 3 )
 _sections_unfolded = [ "Transform" ]
 
 [node name="battle_manager" type="Node" parent="." index="3"]
 
-script = ExtResource( 4 )
+script = ExtResource( 3 )
 _sections_unfolded = [ "Pause" ]
 
-[node name="main_camera" parent="." index="4" instance=ExtResource( 5 )]
+[node name="main_camera" parent="." index="4" instance=ExtResource( 4 )]
 
 current = true
 fov = 100.0

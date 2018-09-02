@@ -2,6 +2,7 @@ extends Object
 
 # This file is for defining map tiles and the various interactions/characteristics
 
+# These map 1-to-1 with mesh library indices for simplicity
 enum TileTypes {
 	None = 0,
 	GroundDirt,
@@ -28,7 +29,8 @@ enum TileTypes {
 }
 
 # TODO: Determine if these cause damage to characters or do they just
-# 	influence stats
+# 	influence stats, also how are these visually represented? Some
+#	form of alternate in the types list?
 enum TileStatus {
 	None = 0,
 	Electrified,
@@ -54,3 +56,24 @@ var tech_attack_modifier = 0
 # These are likely to be rarely used
 var phys_defense_modifier = 0
 var phys_attack_modifier = 0
+
+func _init(t):
+	type = t
+	status = TileStatus.None
+
+	# Set characteristics based on type
+	match type:
+		None:
+			pass
+		TileTypes.GroundDirt:
+			pass
+		_:
+			print("tile._init(): Invalid type (%s) given!" % t)
+
+func set_status(new):
+	status = new
+
+	# Evaluate new status, changing type(?) if necessary
+	match status:
+		_:
+			pass
