@@ -1,6 +1,7 @@
 extends Spatial
 
 onready var grid = get_node("map_grid")
+
 var grid_graph = {}
 var grid_min = Vector3(100, 100, 100)
 var grid_max = Vector3(-100, -100, -100)
@@ -50,6 +51,14 @@ func _ready():
 #	# Update game logic here.
 #	pass
 
+func set_obstacles(arr):
+	# This is a bit paranoid, but may need to iterate over this
+	# in order to correctly manage memory
+	if obstacles.empty() == false:
+		obstacles.clear()
+	
+	obstacles = arr
+
 # Returns y-height if cell exists at X and Z coordinate, else returns null
 func get_cell_height_if_exists(map_pos):
 	var xz = Vector2(map_pos.x, map_pos.z)
@@ -62,15 +71,20 @@ func get_neighbors(map_pos, max_vertical):
 	var neighbors = []
 	for dir in grid_directions:
 		var tmp = map_pos + dir
-		if grid_graph.has(Vector2(tmp.x, tmp.z)) == true:
-			tmp = grid_graph[Vector2(tmp.x, tmp.z)]
-		
-			var vert_dist = map_pos.y - tmp.y
-			if vert_dist <= max_vertical && is_pos_in_grid(tmp) && obstacles.find(tmp) == -1:
-				neighbors.append(MapCell.new(tmp, get_world_coords(tmp), null, 0))
+		# Working around not having tuples/other niceties
+		var res = is_pos_top_level(tmp)
+		if res.front() == false:
+			continue
+
+		tmp = res.back()
+		var vert_dist = map_pos.y - tmp.y
+		if vert_dist <= max_vertical && obstacles.find(tmp) == -1:
+			neighbors.append(MapCell.new(tmp, get_world_coords(tmp), null, 0))
 	
 	return neighbors
 
+# This is an implementation of BFS, this may need to be revisited for performance
+# reasons later on.
 func get_cells_in_range(world_pos, move_range, max_vertical):
 	var start_grid_pos = get_map_coords(world_pos)
 
@@ -123,6 +137,16 @@ func contains_cell(cell, container):
 			return i
 
 	return null
+
+func is_pos_top_level(pos):
+	var v2 = Vector2(pos.x, pos.z)
+	var res = []
+	if grid_graph.has(v2):
+		res = [true, grid_graph[v2]]
+	else:
+		res = [false, null]
+
+	return res
 
 func is_pos_in_grid(map_pos):
 	return (grid.get_cell_item(map_pos.x, map_pos.y, map_pos.z) != -1)

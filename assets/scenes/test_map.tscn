@@ -2,7 +2,7 @@
 
 [ext_resource path="res://assets/scripts/native/def/resource_stats.gdns" type="Script" id=1]
 [ext_resource path="res://assets/scenes/basic_map.tscn" type="PackedScene" id=2]
-[ext_resource path="res://assets/scripts/maps/basic_map.gd" type="Script" id=3]
+[ext_resource path="res://assets/scripts/maps/map_base.gd" type="Script" id=3]
 [ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=4]
 [ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=5]
 

@@ -5,6 +5,7 @@ extends Node
 #
 # This persists between battles.
 
+var attack_class = load("res://assets/scripts/battle/attack.gd")
 var weapon_class = load("res://assets/scripts/characters/weapon.gd")
 var equip_class = load("res://assets/scripts/characters/equipment.gd")
 
@@ -54,13 +55,6 @@ var expertise = 0			# Technical expertise of character, refer to GDD for effecte
 var base_phys_attack = 0	# A base value for physical attacks, this varies depending on the class. Is the equivalent of attacking with fists
 var base_tech_attack = 0	# A base value for physical attacks, this varies depending on the class. Is the equivalent of attacking with fists
 
-# Evaluated stats, a combination of base character stats and equipment values
-var phys_attack_power = 0	# Raw physical attack power after applying weapon effects
-var tech_attack_power = 0	# Raw technological attack power after applying weapon effects
-
-var phys_defense_power = 0
-var tech_defense_power = 0
-
 func _ready():
 	pass
 
@@ -99,20 +93,22 @@ func evaluate_initial_stats():
 			base_tech_attack = 0
 		_:
 			print("unknown class, all your stats are zero!")
-	
-	# Now evaluate equipment (includes weapons)
-	evaluate_equipment()
 
+# Evaluates equipment, returning array with these contents:
+#	- Total physical attack magnitude
+#	- Total tech attack magnitude
+#	- Total physical defense magnitude
+#	- Total tech defense magnitude
 func evaluate_equipment():
 	var phys_atk_contrib = base_phys_attack
 	var tech_atk_contrib = base_tech_attack
 
-	# Reset these to their base values
-	phys_attack_power = power
-	tech_attack_power = expertise
+	# Set the base values
+	var phys_atk = power
+	var phys_def = armor
 
-	phys_defense_power = armor
-	tech_attack_power = disruption
+	var tech_atk = expertise
+	var tech_def = disruption
 
 	# Determine:
 	#	* active weapon (if null)
@@ -128,19 +124,20 @@ func evaluate_equipment():
 				phys_atk_contrib = active_weapon.get_state().phys_attack_power
 				tech_atk_contrib = active_weapon.get_state().tech_attack_power
 		elif e is equip_class:
-			phys_defense_power += e.get_state().armor_value
-			tech_defense_power += e.get_state().disruption_value
+			phys_def += e.get_state().armor_value
+			tech_def += e.get_state().disruption_value
 
 	if phys_atk_contrib > 0:
-		phys_attack_power += phys_atk_contrib
+		phys_atk += phys_atk_contrib
 	else:
-		phys_attack_power = 0
+		phys_atk = 0
 
 	if tech_atk_contrib > 0:
-		tech_attack_power += tech_atk_contrib
+		tech_atk += tech_atk_contrib
 	else:
-		tech_attack_power = 0
+		tech_atk = 0
 
+	return [phys_atk, tech_atk, phys_def, tech_def]
 
 # Called after every turn, used for temporary effects (ENG increment, turn-based increases to PWR/SKL/EPT/etc)
 func evaluate_turn_end():
@@ -165,5 +162,18 @@ func set_active_weapon(wep):
 		print("Invalid weapon (%s) given to %s as active weapon!" % [wep, self])
 	else:
 		active_weapon = wep	# TODO: Or `active_weapon = inventory[idx]`?
+
+func generate_attack():
+	# Evaluate equipment to generate an attack object
+	var stats = evaluate_equipment()
+	var atk = attack_class.new(attack_class.AttackType.Physical, stats[0], stats[1], 1.0)
+	return atk
+
+func evaluate_attack(attack):
+	var stats = evaluate_equipment()
+	if attack.phys_attack_magnitude > 0:
+		attack.phys_attack_magnitude -= stats[2]
+
+	if attack.tech_attack_magnitude > 0:
+		attack.tech_attack_magnitude -= stats[3]
 	
-	evaluate_equipment()

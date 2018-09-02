@@ -4,6 +4,8 @@ extends Node
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../map_root")
 
+var map_base = load("res://assets/scripts/maps/map_base.gd")
+
 onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
 var character_scene = load("res://assets/scenes/character.tscn")
 var character_state = load("res://assets/scripts/characters/character_state.gd")
@@ -83,7 +85,7 @@ func _ready():
 	var test_vest = equipment_scene.instance()
 	test_vest.init(equipment_state.EquipNames.BASIC_VEST)
 	test_ch.add_equipment(test_vest)
-	
+
 	# Player team starts the battle
 	current_team = player_team
 	start_next_turn()
@@ -102,19 +104,19 @@ func _exit_tree():
 
 # Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
 func evaluate_battlefield():
-	var obstacles = []
+	var battle_obstacles = []
 	
 	for c in player_team.values():
 		var char_pos = c.translation
 		char_pos.y -= 2
-		obstacles.append(map.get_map_coords(char_pos))
+		battle_obstacles.append(map.get_map_coords(char_pos))
 
 	for c in enemy_team.values():
 		var char_pos = c.translation
 		char_pos.y -= 2
-		obstacles.append(map.get_map_coords(char_pos))
+		battle_obstacles.append(map.get_map_coords(char_pos))
 
-	map.obstacles = obstacles
+	map.set_obstacles(battle_obstacles)
 	return
 
 func start_next_turn():
