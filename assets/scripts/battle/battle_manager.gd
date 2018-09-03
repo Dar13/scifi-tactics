@@ -2,7 +2,7 @@ extends Node
 
 # class member variables go here, for example:
 onready var camera = get_viewport().get_camera()
-onready var map = get_node("../map_root")
+var map = null
 
 onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
 var character_scene = load("res://assets/scenes/character.tscn")
@@ -23,6 +23,11 @@ var enemy_team = {}
 onready var fps_label = get_node("../fps_label")
 
 func _ready():
+	# Load the battle's map, according to the 'Map' scene, and add it to the scene
+	map = load(global_state.battle_map).instance()
+	map.name = "map"	# We don't care what the scene we instanced calls itself
+	add_child(map)
+
 	add_child(character_mgr)
 	character_mgr.connect("battlefield_updated", self, "evaluate_battlefield")
 	character_mgr.connect("turn_done", self, "finish_turn")
@@ -31,7 +36,7 @@ func _ready():
 	# For now this means, spawn the teams
 	
 	# Setup the 'player' team
-	var test_positions = [Vector3(0, 2, 0), Vector3(2, 2, 0), Vector3(-2, 2, 0)]
+	var test_positions = [Vector3(0, 2, 10), Vector3(2, 2, 8), Vector3(-2, 2, 8)]
 	for i in range(3):
 		var state = character_state.new()
 		state.character_class = character_state.Classes.BASIC
@@ -46,7 +51,7 @@ func _ready():
 		player_team[character.get_collider().get_instance_id()] = character
 
 	# Setup the 'enemy' team
-	test_positions = [Vector3(0, 6, -6), Vector3(2, 4, -6), Vector3(-2, 6, -6)]
+	test_positions = [Vector3(-4, 2, -8), Vector3(0, 2, -8), Vector3(-8, 4, -8)]
 	for i in range(3):
 		var state = character_state.new()
 		state.character_class = character_state.Classes.BASIC

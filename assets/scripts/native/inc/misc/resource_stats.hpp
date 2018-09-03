@@ -1,8 +1,17 @@
-#ifndef END_STATS_H
-#define END_STATS_H
+#ifndef RES_STATS_H
+#define RES_STATS_H
 
 #include <Godot.hpp>
 #include <Node.hpp>
+
+/*
+ * This is an example class showing how a C++ script in Godot can work.
+ * Specifically it shows how to:
+ *      - Print to stdout
+ *      - Retrieve/use global singleton object (both user-defined and Engine)
+ *      - Register/handle notifications
+ *      - Switch scenes
+ */
 
 namespace godot {
     class resource_stats : public godot::GodotScript<Node> {
@@ -24,4 +33,4 @@ namespace godot {
     };
 }
 
-#endif
+#endif  // RES_STATS_H

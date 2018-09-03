@@ -1,11 +1,11 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://assets/scripts/native/def/resource_stats.gdns" type="Script" id=1]
+[ext_resource path="res://assets/scripts/transition.gd" type="Script" id=1]
 [ext_resource path="res://assets/scenes/basic_map.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=3]
 [ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=4]
 
-[node name="root" type="Node" index="0"]
+[node name="root" type="Node"]
 
 script = ExtResource( 1 )
 

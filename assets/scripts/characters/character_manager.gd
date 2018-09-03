@@ -35,7 +35,7 @@ onready var char_dir_arrows = character_direction_arrows.instance()
 onready var char_stats_menu = character_stats_menu.instance()
 
 onready var camera = get_viewport().get_camera()
-onready var map = get_node("../../map_root")
+onready var map = get_node("../map")
 
 var perform_click_raycast = false
 
@@ -56,10 +56,8 @@ func prepare_for_turn(new_characters):
 func finalize_turn():
 	emit_signal("turn_done")
 
-# Called every time the node is added to the scene.
+# Initialize the character manager
 func _ready():
-	# Initialization here
-
 	# Create some cached instances of move tiles so we don't keep recreating them
 	# Max movement range is 5 for now(lol kinda), so make 10*10 tiles (i.e. [(-5, 0, -5) -> (5, 0, 5)])
 	for i in range(10 * 10):

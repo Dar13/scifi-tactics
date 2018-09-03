@@ -67,8 +67,14 @@ func _init(t):
 			pass
 		TileTypes.GroundDirt:
 			pass
+		TileTypes.GroundGrass:
+			pass
+		TileTypes.GroundSnow:
+			pass
+		TileTypes.GroundStone:
+			pass
 		_:
-			print("tile._init(): Invalid type (%s) given!" % t)
+			print("tile._init(): Invalid/Unhandled type (%s) given!" % t)
 
 func set_status(new):
 	status = new

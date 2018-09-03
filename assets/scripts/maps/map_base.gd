@@ -2,7 +2,7 @@ extends Spatial
 
 var tile_class = load("res://assets/scripts/maps/tile.gd")
 
-onready var grid = get_node("grid")
+onready var grid = get_node("./grid")
 
 # Key is Vector2(X,Z) coordinate, Value is [Tile, Vector3]
 const GRID_TILE = 0

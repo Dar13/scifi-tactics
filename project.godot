@@ -11,7 +11,7 @@ config_version=3
 [application]
 
 config/name="Scifi-Tactics"
-run/main_scene="res://assets/scenes/test_map.tscn"
+run/main_scene="res://assets/scenes/battle.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -20,8 +20,8 @@ global_state="*res://assets/scripts/global_state.gd"
 
 [display]
 
-window/size/width=1920
-window/size/height=1080
+window/size/width=2560
+window/size/height=1440
 window/size/resizable=false
 window/dpi/allow_hidpi=true
 window/vsync/use_vsync=false
