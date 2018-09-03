@@ -1,17 +1,18 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://assets/scripts/transition.gd" type="Script" id=1]
-[ext_resource path="res://assets/scenes/battle_manager.gd" type="Script" id=2]
+[ext_resource path="res://assets/scripts/battle/battle_manager.gd" type="Script" id=2]
 [ext_resource path="res://assets/fonts/dejavu_sans_20.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=4]
 
-[node name="base" type="Node"]
+[node name="base" type="Node" index="0"]
 
 script = ExtResource( 1 )
 
 [node name="battle_manager" type="Node" parent="." index="0"]
 
 script = ExtResource( 2 )
+_sections_unfolded = [ "Pause" ]
 
 [node name="fps_label" type="Label" parent="." index="1"]
 
