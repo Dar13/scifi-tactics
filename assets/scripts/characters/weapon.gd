@@ -29,6 +29,9 @@ func do_special_effect(character):
 	instance.do_special_effect(character)	# Dispatch?
 	pass
 
+func check_target(object):
+	return instance.check_target(object)
+
 func do_attack(object):
 	return instance.do_attack(object)
 

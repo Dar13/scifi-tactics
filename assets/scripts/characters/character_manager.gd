@@ -197,7 +197,7 @@ func handle_click(object):
 							else:
 								# Deselect? Clicked another team's character during movement selection
 								pass
-						character.Phases.AttackWeapon:
+						character.Phases.AttackWeapon, character.Phases.AttackAbility:
 							var clicked_world_pos = clicked_character.translation
 							clicked_world_pos.y = floor(clicked_world_pos.y - clicked_character.get_visual_bounds().size.y / 2)
 							var clicked_map_coord = map.get_map_coords(clicked_world_pos)
@@ -207,8 +207,7 @@ func handle_click(object):
 								world_pos.y = floor(world_pos.y)
 								var tile_map_coord = map.get_map_coords(world_pos)
 								if tile.visible == true && clicked_map_coord == tile_map_coord:
-									attack_target = clicked_character
-									update_character_phase(selected_character, character.Phases.AttackConfirm)
+									update_attack(clicked_character)
 				elif clicked_is_on_team == true:
 					select_character(clicked_character)
 
@@ -225,9 +224,8 @@ func handle_click(object):
 							selected_character.move(tile_map_pos)
 							tile_world_pos.y += selected_character.get_visual_bounds().size.y / 2
 							camera.center_around_point(tile_world_pos, camera.SPEED_LO)
-						character.Phases.AttackWeapon:
-							attack_target = parent
-							update_character_phase(selected_character, character.Phases.AttackConfirm)
+						character.Phases.AttackAbility, character.Phases.AttackWeapon:
+							update_attack(parent)
 		elif char_dir_arrows.select_arrow(parent):
 			# Nothing further needed here, response to this is handled in the signal
 			# handler. However, wanted to keep the logic flow consistent here.
@@ -235,6 +233,13 @@ func handle_click(object):
 		else:
 			print("clicked was unhandled (potentially the map) Collider = %s" % parent)
 	return
+
+func update_attack(tgt):
+	# TODO: Handle selected character current phase being AttackAbility!
+	# 	Easy way would be to make abilities have same base set of functions.
+	if selected_char_weapon.check_target(tgt):
+		attack_target = tgt
+		update_character_phase(selected_character, character.Phases.AttackConfirm)
 
 func handle_cancel():
 	if selected_character:
@@ -390,22 +395,18 @@ func display_char_attack_tiles(attack_space_locations):
 		character_move_tiles[idx].display(real_pos, Color(1.0, 0.0, 0.0))
 		idx += 1
 
-func display_char_move_tiles(object, distance):
-	var character = null
-	# TODO: Is there a way to verify it's a character??
-	if object != null:
-		character = object
-	else:
+func display_char_move_tiles(ch, distance):
+	if ch == null || (ch is character) == false:
 		return
 
 	# Calculate the map coordinate the character is at
-	var char_pos = character.translation
+	var char_pos = ch.translation
 	char_pos = char_pos + Vector3(0, -2, 0)
 	var char_cell = map.get_map_coords(char_pos)
 	# TODO: Raycast downwards to get precise Y-axis value?
 
 	# Get the possible move tiles for this character
-	var move_tiles = map.get_cells_in_range(char_pos, character.state.movement_range, 2)
+	var move_tiles = map.get_cells_in_range(char_pos, ch.state.movement_range, 2)
 	var idx = 0
 	for tile in move_tiles:
 		var tile_world_pos = map.get_world_coords(tile.map_position)
@@ -414,7 +415,7 @@ func display_char_move_tiles(object, distance):
 		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 1.0))
 		idx += 1
 	
-	character.set_movement_space(move_tiles)
+	ch.set_movement_space(move_tiles)
 
 func hide_char_tiles():
 	for idx in range(10 * 10):

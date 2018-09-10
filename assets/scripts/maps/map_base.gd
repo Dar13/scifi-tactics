@@ -4,9 +4,7 @@ var tile_class = load("res://assets/scripts/maps/tile.gd")
 
 onready var grid = get_node("./grid")
 
-# Key is Vector2(X,Z) coordinate, Value is [Tile, Vector3]
-const GRID_TILE = 0
-const GRID_POS = 1
+# Key is Vector2(X,Z) coordinate, Value is GridGraphNode
 var grid_graph = {}
 
 var grid_min = Vector3(100, 100, 100)
@@ -26,6 +24,18 @@ class MapCell:
 		world_position = world_pos
 		previous = prev
 		distance = dist
+
+class GridGraphNode:
+	var tile
+	var position
+	func _init(grid, pos):
+		var tile_class = load("res://assets/scripts/maps/tile.gd")
+		tile = tile_class.new(grid.get_cell_item(pos.x, pos.y, pos.z))
+		position = pos
+
+	func _notification(what):
+		if what == NOTIFICATION_PREDELETE:
+			tile.free()
 
 func _ready():
 	# Calculate grid extents for later use
@@ -48,9 +58,7 @@ func _ready():
 				if is_pos_in_grid(Vector3(x, y, z)) == true:
 					highest_y = y
 
-			var tile = tile_class.new(grid.get_cell_item(x, highest_y, z))
-			grid_graph[Vector2(x, z)] = [tile, Vector3(x, highest_y, z)]
-
+			grid_graph[Vector2(x, z)] = GridGraphNode.new(grid, Vector3(x, highest_y, z))
 	pass
 
 #func _process(delta):
@@ -61,8 +69,7 @@ func _ready():
 func set_tile_status(tile_pos, new_status):
 	var top_level = is_pos_top_level(tile_pos)
 	if top_level[TOP_RESULT] == true:
-		var tile = grid_graph[top_level[TOP_KEY]][GRID_TILE]
-		tile.set_status(new_status)
+		grid_graph[top_level[TOP_KEY]].tile.set_status(new_status)
 
 func set_obstacles(arr):
 	# This is a bit paranoid, but may need to iterate over this
@@ -76,7 +83,7 @@ func set_obstacles(arr):
 func get_cell_height_if_exists(map_pos):
 	var xz = Vector2(map_pos.x, map_pos.z)
 	if grid_graph.has(xz):
-		return grid_graph[xz][GRID_POS].y
+		return grid_graph[xz].position.y
 
 	return null
 
@@ -102,6 +109,7 @@ func get_cells_in_range(world_pos, move_range, max_vertical):
 	var start_grid_pos = get_map_coords(world_pos)
 
 	if is_pos_in_grid(start_grid_pos) == false:
+		print("1")
 		return []
 
 	var visited_cells = [ MapCell.new(start_grid_pos, get_world_coords(start_grid_pos), null, 0) ]
@@ -141,7 +149,7 @@ func get_cells_in_range(world_pos, move_range, max_vertical):
 				contained.previous = cell
 				contained.distance = cell.distance + real_cost
 
-
+	print(finished_cells)
 	return finished_cells
 
 func contains_cell(cell, container):
@@ -161,7 +169,7 @@ func is_pos_top_level(pos):
 	var v2 = Vector2(pos.x, pos.z)
 	var res = []
 	if grid_graph.has(v2):
-		res = [true, v2, grid_graph[v2][GRID_POS]]
+		res = [true, v2, grid_graph[v2].position]
 	else:
 		res = [false, null, null]
 

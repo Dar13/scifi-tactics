@@ -24,9 +24,14 @@ func get_attack_pattern(map_pos):
 				   map_pos + Vector3(0, 0, 1), map_pos + Vector3(0, 0, -1)]
 	return pattern
 
-# Quick test of inheritance capabilities
 func do_special_effect(character):
 	print("derived do_special_effect called!")
+
+func check_target(object):
+	if object is character:
+		return true
+	else:
+		return false
 
 func do_attack(object):
 	var rv = false
