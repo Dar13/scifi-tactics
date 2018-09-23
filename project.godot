@@ -11,8 +11,9 @@ config_version=3
 [application]
 
 config/name="Scifi-Tactics"
-run/main_scene="res://assets/scenes/battle.tscn"
+run/main_scene="res://assets/scenes/gui/main_menu.tscn"
 config/icon="res://icon.png"
+config/auto_accept_quit=false
 
 [autoload]
 

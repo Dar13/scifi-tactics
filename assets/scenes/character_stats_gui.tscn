@@ -1,7 +1,9 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://assets/scripts/characters/character_stats_gui.gd" type="Script" id=1]
-[ext_resource path="res://assets/scenes/character_stats_basic_1.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/scenes/gui/character_stats_basic.tscn" type="PackedScene" id=2]
+
+
 
 [node name="character_stats_panel" type="PopupPanel"]
 
@@ -10,7 +12,7 @@ anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 0.0
 margin_left = 1400.0
-margin_right = -264.0
+margin_right = -760.0
 margin_bottom = 192.0
 rect_min_size = Vector2( 256, 192 )
 rect_pivot_offset = Vector2( 0, 0 )
@@ -23,6 +25,21 @@ popup_exclusive = false
 script = ExtResource( 1 )
 _sections_unfolded = [ "Anchor", "Margin", "Rect" ]
 
-[node name="root" parent="." index="0" instance=ExtResource( 2 )]
+[node name="compact" parent="." index="0" instance=ExtResource( 2 )]
+
+[node name="expanded" type="Control" parent="." index="1"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 400.0
+margin_bottom = 490.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 1
 
 

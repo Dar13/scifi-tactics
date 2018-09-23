@@ -2,11 +2,12 @@ extends PopupPanel
 
 var character_class = load("res://assets/scripts/characters/character.gd")
 
-onready var layout_root = get_node("./root")
+onready var compact_layout = get_node("./compact")
+onready var expanded_layout = get_node("./expanded")
 
 func _ready():
 	pass
 
 func populate(character):
 	if character is character_class:
-		layout_root.fill(character)
+		compact_layout.fill(character)

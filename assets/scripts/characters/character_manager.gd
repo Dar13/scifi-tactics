@@ -7,7 +7,7 @@ var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
 var move_tile = load("res://assets/scripts/move_tile.gd")
 var character = load("res://assets/scripts/characters/character.gd")
 var character_dir = load("res://assets/scripts/characters/character_direction.gd")
-var character_stats_menu = load("res://assets/scenes/character_stats_gui.tscn")
+var character_stats = load("res://assets/scenes/gui/character_stat_panel.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
 var character_direction_arrows = load("res://assets/models/characters/character_direction_arrow/character_dir_arrows.tscn")
@@ -32,7 +32,7 @@ var attack_context = null
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 onready var selected_char_attack_preview = attack_preview_menu.instance()
 onready var char_dir_arrows = character_direction_arrows.instance()
-onready var char_stats_menu = character_stats_menu.instance()
+onready var char_stats_menu = character_stats.instance()
 
 onready var camera = get_viewport().get_camera()
 onready var map = get_node("../map")
@@ -86,7 +86,6 @@ func _ready():
 	selected_char_attack_preview.visible = false
 	add_child(selected_char_attack_preview)
 	
-	char_stats_menu.visible = false
 	add_child(char_stats_menu)
 
 	add_child(char_dir_arrows)
@@ -126,18 +125,9 @@ func _physics_process(delta):
 		if cast_result.empty() == false:
 			var collider_parent = cast_result["collider"].get_parent()
 			if collider_parent != null:
-				# Don't popup the character stats if it's for an attack target
-				if collider_parent == mouse_over_last and collider_parent != attack_target:
-					var diff = (OS.get_ticks_msec() - mouse_last_moved) / 1000.0
-					# If the difference is greater than a second, display the stats panel
-					if diff > 1:
-						char_stats_menu.populate(mouse_over_last)
-						char_stats_menu.popup(Rect2(Vector2(mouse_pos.x + 1, mouse_pos.y + 1), Vector2(128, 196)))
-						char_stats_menu.grab_click_focus()
-				else:
-					# Ensure the collider is a character (or part of the map??, haven't decided)
-					if collider_parent is character:
-						mouse_over_last = collider_parent
+				# Ensure the collider is a character (or part of the map??, haven't decided)
+				if collider_parent is character:
+					mouse_over_last = collider_parent
 
 				# Check against the character direction arrows for highlighting purposes
 				if char_dir_arrows.is_visible():
@@ -154,18 +144,37 @@ func _unhandled_input(event):
 	if event is InputEventMouseMotion:
 		# TODO: Fuzz factor, in case someone has shaky hands or buggy mouse?
 		mouse_last_moved = OS.get_ticks_msec()
-		if char_stats_menu.visible && char_stats_menu.get_global_rect().grow(1).has_point(mouse_pos) == false:
-			char_stats_menu.hide()
-			# Uncomment when expansion/shrink is implemented
-			#char_stats_menu.shrink()
 
 	return
+
+func click_character(ch):
+	if selected_character:
+		match selected_character.current_phase:
+			character.Phases.Selected:
+				selected_character.deselect(true)
+				select_character(ch)
+
+			character.Phases.AttackWeapon, character.Phases.AttackAbility:
+				var clicked_world_pos = ch.translation
+				clicked_world_pos.y = floor(clicked_world_pos.y - ch.get_visual_bounds().size.y / 2)
+				var clicked_map_coord = map.get_map_coords(clicked_world_pos)
+
+				for tile in character_move_tiles:
+					var world_pos = tile.translation
+					world_pos.y = floor(world_pos.y)
+					var tile_map_coord = map.get_map_coords(world_pos)
+					if tile.visible == true && clicked_map_coord == tile_map_coord:
+						update_attack(ch)
+	else:
+		select_character(ch)
 
 func select_character(ch):
 	if ch.current_phase != character.Phases.Done:
 		selected_character = ch
 		selected_character.select()
 		selected_char_original_direction = selected_character.facing
+		char_stats_menu.set_character(selected_character)
+		char_stats_menu.show()
 		
 		camera.center_around_point(selected_character.translation, camera.SPEED_LO)
 
@@ -182,42 +191,15 @@ func handle_click(object):
 		if parent is character:
 			if battle_characters.has(object.get_instance_id()):
 				var clicked_character = battle_characters[object.get_instance_id()]
-				var clicked_is_on_team = current_team.has(object.get_instance_id())
-
-				if selected_character != null:
-					match selected_character.current_phase:
-						character.Phases.Selected:
-							if clicked_is_on_team == true:
-								if selected_character != clicked_character:
-									selected_character.deselect(true)
-								elif selected_character == clicked_character:
-									return # Player clicked the selected character
-
-								select_character(clicked_character)
-							else:
-								# Deselect? Clicked another team's character during movement selection
-								pass
-						character.Phases.AttackWeapon, character.Phases.AttackAbility:
-							var clicked_world_pos = clicked_character.translation
-							clicked_world_pos.y = floor(clicked_world_pos.y - clicked_character.get_visual_bounds().size.y / 2)
-							var clicked_map_coord = map.get_map_coords(clicked_world_pos)
-
-							for tile in character_move_tiles:
-								var world_pos = tile.translation
-								world_pos.y = floor(world_pos.y)
-								var tile_map_coord = map.get_map_coords(world_pos)
-								if tile.visible == true && clicked_map_coord == tile_map_coord:
-									update_attack(clicked_character)
-				elif clicked_is_on_team == true:
-					select_character(clicked_character)
-
+				click_character(clicked_character)
 		elif parent is move_tile:
 			var tile_idx = character_move_tiles.find(parent)
 			if tile_idx > -1:
 				var tile_world_pos = character_move_tiles[tile_idx].translation
 				tile_world_pos.y = round(tile_world_pos.y)
 				var tile_map_pos = map.get_map_coords(tile_world_pos)
-				if selected_character != null:
+				# Only process movement if the selected character is on the current team
+				if selected_character && current_team.values().has(selected_character):
 					match selected_character.current_phase:
 						character.Phases.Selected:
 							selected_char_original_pos = selected_character.translation

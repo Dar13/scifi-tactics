@@ -22,6 +22,7 @@ enum JumpType {
 }
 
 var character_class = Classes.BASIC
+var character_class_str = "Basic"
 
 # Progression attributes
 var level = 1
@@ -68,6 +69,7 @@ func destroy():
 func evaluate_initial_stats():
 	match character_class:
 		Classes.BASIC:
+			character_class_str = "Basic"
 			health = level * 60
 			max_health = health
 			energy = level * 25

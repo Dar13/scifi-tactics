@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/fonts/dejavu_sans_20.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/scenes/battle_camera.tscn" type="PackedScene" id=4]
 
-[node name="base" type="Node" index="0"]
+[node name="base" type="Node"]
 
 script = ExtResource( 1 )
 

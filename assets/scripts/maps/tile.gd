@@ -33,9 +33,10 @@ enum TileTypes {
 #	form of alternate in the types list?
 enum TileStatus {
 	None = 0,
-	Electrified,
-	Burning,
-	Frozen,
+	Electrified,	# Boost tech, damage certain chars(?)
+	Burning,	# Snow -> Ground, Ice -> Water/Wet
+	Frozen,		# Ground -> Snow/Ice, Wet Street -> Frozen Street
+	Shattered,	# Building damage
 	NumTileStatus,
 	Invalid
 }
@@ -79,7 +80,12 @@ func _init(t):
 func set_status(new):
 	status = new
 
-	# Evaluate new status, changing type(?) if necessary
-	match status:
+	# Evaluate new status, changing type if necessary
+	match type:
+		TileTypes.GroundSnow:
+			if status == TileStatus.Burning:
+				type = TileTypes.GroundDirt
 		_:
 			pass
+
+	# TODO: Update relevant GridMap with new type
