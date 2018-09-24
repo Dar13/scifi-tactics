@@ -16,6 +16,8 @@ onready var energy_numeric = get_node("overview/info_container/meta_col/energy_n
 onready var health_bar = get_node("overview/info_container/meta_col/health_bar")
 onready var energy_bar = get_node("overview/info_container/meta_col/energy_bar")
 
+onready var inv_item_container = get_node("tabs/inventory/item_container")
+
 func _ready():
 	shrinko.connect("pressed", self, "do_shrink")
 
@@ -34,4 +36,9 @@ func fill(c):
 	energy_numeric.text = "Energy  %s / %s" % [c.state.energy, c.state.max_energy]
 	energy_bar.max_value = c.state.max_energy
 	energy_bar.value = c.state.energy
+
+	for item in c.state.inventory:
+		var ctl = Label.new()
+		ctl.text = item.get_name()
+		inv_item_container.add_child(ctl)
 	pass
