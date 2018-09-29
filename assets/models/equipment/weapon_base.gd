@@ -5,6 +5,7 @@ var character = load("res://assets/scripts/characters/character.gd")
 
 var state = null
 var e_name = "<null>"
+var e_desc = "<null>"
 var thumbnail = null
 
 func _init():

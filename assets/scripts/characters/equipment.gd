@@ -25,3 +25,9 @@ func get_state():
 
 func get_name():
 	return instance.e_name
+
+func get_description():
+	return instance.e_desc
+
+func get_thumbnail():
+	return instance.thumbnail

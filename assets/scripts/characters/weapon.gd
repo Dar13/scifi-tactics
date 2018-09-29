@@ -35,11 +35,5 @@ func check_target(object):
 func do_attack(object):
 	return instance.do_attack(object)
 
-func get_name():
-	return instance.e_name
-
-func get_thumbnail():
-	return instance.thumbnail
-
 func get_state():
 	return instance.get_state()

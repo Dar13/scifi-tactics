@@ -105,6 +105,9 @@ func _exit_tree():
 	selected_char_attack_preview.free()
 	char_stats_menu.free()
 
+	if attack_context:
+		attack_context.free()
+
 func _physics_process(delta):
 	# Called every physics timestep. Delta is time since last frame.
 	# Perform a raycast every timestep, used for mouse-over handling and will
@@ -247,6 +250,10 @@ func handle_attack():
 				selected_char_menu.visible = false
 				selected_char_wep_menu.visible = true
 			character.Phases.AttackConfirm:
+				attack_context.free()
+				attack_context = null
+
+				# TODO: Properly evaluate the attack context here
 				selected_char_weapon.do_attack(attack_target)
 				update_character_phase(selected_character, character.Phases.Done)
 

@@ -2,6 +2,7 @@ extends "res://assets/models/equipment/weapon_base.gd"
 
 func _init():
 	e_name = "Basic Weapon"
+	e_desc = "A weapon so generic it doesn't have a proper description :P"
 
 	state.attack_range = 1
 

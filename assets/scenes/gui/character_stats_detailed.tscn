@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/fonts/dejavu_sans_16.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/gui/minimize.png" type="Texture" id=4]
 
-[node name="root" type="Panel" index="0"]
+[node name="root" type="Panel"]
 
 anchor_left = 0.0
 anchor_top = 0.5
@@ -593,20 +593,41 @@ size_flags_horizontal = 1
 size_flags_vertical = 1
 _sections_unfolded = [ "Anchor", "Margin" ]
 
-[node name="item_container" type="VBoxContainer" parent="tabs/inventory" index="0"]
+[node name="item_container" type="ScrollContainer" parent="tabs/inventory" index="0"]
 
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 rect_pivot_offset = Vector2( 0, 0 )
-rect_clip_content = false
-mouse_filter = 1
+rect_clip_content = true
+mouse_filter = 0
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
+scroll_horizontal_enabled = false
+scroll_horizontal = 0
+scroll_vertical_enabled = true
+scroll_vertical = 0
+scroll_deadzone = 0
+_sections_unfolded = [ "Scroll" ]
+
+[node name="items" type="VBoxContainer" parent="tabs/inventory/item_container" index="0"]
+
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 508.0
+margin_bottom = 324.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 1
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 alignment = 0
-_sections_unfolded = [ "Anchor", "Margin" ]
+_sections_unfolded = [ "Columns" ]
 
 [node name="item_desc_panel" type="Panel" parent="tabs/inventory" index="1"]
 
@@ -654,7 +675,7 @@ size_flags_vertical = 1
 text = "Item Details"
 align = 1
 valign = 1
-percent_visible = -1.0
+percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
 _sections_unfolded = [ "Anchor", "BBCode", "Margin", "Rect", "Size Flags", "custom_fonts" ]
@@ -691,9 +712,11 @@ mouse_filter = 2
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 3
+custom_fonts/font = ExtResource( 3 )
+autowrap = true
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "Size Flags" ]
+_sections_unfolded = [ "Size Flags", "custom_fonts" ]
 
 
