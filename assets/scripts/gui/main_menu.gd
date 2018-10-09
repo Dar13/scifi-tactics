@@ -17,7 +17,8 @@ func _ready():
 	pass
 
 func start_new():
-	get_tree().change_scene(new_game_scene)
+	global_state.next_scene = new_game_scene
+	get_tree().change_scene("res://assets/scenes/loading.tscn")
 
 func load_game():
 	get_tree().change_scene(continue_game_scene)

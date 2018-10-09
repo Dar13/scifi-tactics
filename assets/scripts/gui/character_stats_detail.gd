@@ -41,6 +41,8 @@ func fill(c):
 	energy_bar.max_value = c.state.max_energy
 	energy_bar.value = c.state.energy
 
+	inv_item_desc.text = ""
+
 	# Clear out the existing items (if any)
 	for child in inv_item_list.get_children():
 		child.queue_free()
