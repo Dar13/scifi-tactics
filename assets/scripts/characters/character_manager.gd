@@ -172,13 +172,16 @@ func click_character(ch):
 		select_character(ch)
 
 func select_character(ch):
+	selected_character = null
+
+	char_stats_menu.set_character(ch)
+	char_stats_menu.show()
+
 	if ch.current_phase != character.Phases.Done:
 		selected_character = ch
 		selected_character.select()
 		selected_char_original_direction = selected_character.facing
-		char_stats_menu.set_character(selected_character)
-		char_stats_menu.show()
-		
+
 		camera.center_around_point(selected_character.translation, camera.SPEED_LO)
 
 func handle_click(object):

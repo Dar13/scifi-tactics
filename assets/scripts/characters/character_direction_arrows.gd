@@ -49,7 +49,6 @@ func set_position(pos):
 func select_arrow(obj):
 	if is_visible() && direction_arrows.has(obj.name):
 		selected_direction = direction_arrows[obj.name]
-		print("selected %s = %s" % [obj.name, selected_direction])
 		emit_signal("confirmed")
 		return true
 	else:
