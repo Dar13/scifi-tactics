@@ -20,9 +20,6 @@ func _ready():
 	hide()
 
 func populate(context):
-	if(context.defender_info["damage"] > 0):
-		counter_atk_indicator.show()
-
 	atk_name.text = context.attacker_info["name"]
 	atk_hp.value = context.attacker_info["health"]
 	atk_hp.max_value = context.attacker_info["health_max"]
@@ -36,8 +33,12 @@ func populate(context):
 	def_hp.max_value = context.defender_info["health_max"]
 	def_eng.value = context.defender_info["energy"]
 	def_eng.max_value = context.defender_info["energy_max"]
-	# TODO: Special-case this based on value
-	def_dmg.text = str(context.defender_info["damage"])
-	def_hit.text = str(context.defender_info["hit_chance"])
+
+	# Is a counter-attack happening?
+	if(context.defender_info["damage"] > 0):
+		counter_atk_indicator.show()
+
+		def_dmg.text = str(context.defender_info["damage"])
+		def_hit.text = str(context.defender_info["hit_chance"]) + "%"
 
 	show()

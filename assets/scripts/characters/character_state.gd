@@ -38,12 +38,19 @@ var start_energy = 0		# Starting energy of character at start of battle
 var energy_gain = 0			# Energy gain per turn of character
 var armor = 0				# Modifier on all physical damage taken
 var disruption = 0			# Modifier on all tech damage taken, also has special ability (refer to GDD)
-var physical_dodge = 0		# Overall dodge chance for all received physical attacks
-var physical_hit = 0		# Overall hit chance for all attempted physical attacks
-var tech_dodge = 0			# Overall dodge chance for all received tech attacks
-var tech_hit = 0			# Overall hit chance for all attempted tech attacks
 var stealth = 0				# Overall stealth value, influences other combat values (refer to GDD)
 var jump_type = JumpType.NORMAL
+
+# Hit rate is a per-attack calculated attribute and is subject to the context of that attack.
+# NOTE: All attributes used are after equipment evaluation.
+# The general formula is the following:
+# For physical attacks, Attacker's SKL and Defender's SKL are used.
+# For technological attacks, Attacker's EXP and Defender's EXP are used.
+# For hybrid attacks, the sum of the SKL/EXP skills are used.
+# Raw Odds = (1 + A) / ((1 + A) + (1 + D))
+# Adjusted Hit Rate = 1 / (1 + (e ^ ((RawOdds * -11) + 3)))
+# Steepness = -11, Offset = 5
+# Reference: https://www.reddit.com/r/gamedev/comments/96f8jl/if_you_are_making_an_rpg_you_need_to_know_the/
 
 # Movement/Terrain related
 var movement_range = 5
@@ -78,10 +85,6 @@ func evaluate_initial_stats():
 			energy_gain = 5
 			armor = 4
 			disruption = 3
-			physical_dodge = .5
-			physical_hit = .5
-			tech_dodge = .4
-			tech_hit = .3
 			stealth = 1
 			
 			jump_type = JumpType.NORMAL
@@ -120,7 +123,6 @@ func evaluate_equipment():
 		if e is weapon_class:
 			if active_weapon == null:
 				active_weapon = e
-				print("Setting active wep to %s" % e.get_name())
 
 			if active_weapon == e:
 				phys_atk_contrib = active_weapon.get_state().phys_attack_power
@@ -149,6 +151,21 @@ func evaluate_turn_end():
 func increment_experience(enemy_level, enemy_class):
 	print("TODO: Increment experience. Level: %s, Class %s" % [enemy_level, enemy_class])
 
+func apply_attack(atk_ctx, counter):
+	if counter:
+		if atk_ctx.defender_info["success"]:
+			print("Counter successful")
+			self.health -= atk_ctx.defender_info["damage"]
+		else:
+			print("Counter failed")
+	else:
+		if atk_ctx.attacker_info["success"]:
+			print("Attack successful")
+			self.health -= atk_ctx.attacker_info["damage"]
+		else:
+			print("Attack failed")
+
+
 func add_equipment(item):
 	var rv = false
 	if inventory.size() < 5:
@@ -167,15 +184,55 @@ func set_active_weapon(wep):
 
 func generate_attack():
 	# Evaluate equipment to generate an attack object
+	# TODO: Get attack type from evaluate_equipment()
+	# TODO: Get status scaling from evaluate_equipment()?
 	var stats = evaluate_equipment()
 	var atk = attack_class.new(attack_class.AttackType.Physical, stats[0], stats[1], 1.0)
 	return atk
+
+# Returns a triplet: [physical hit rate, tech hit rate, hybrid hit rate]
+func get_hit_rate(defender):
+	var phys_skill = self.skill
+	var phys_diff = defender.state.skill
+	var tech_skill = self.expertise
+	var tech_diff = defender.state.expertise
+	var hybr_skill = self.skill + self.expertise
+	var hybr_diff = defender.state.skill + defender.state.expertise
+
+	var output = {}
+	output[attack_class.AttackType.Physical] = 0
+	output[attack_class.AttackType.Tech] = 0
+	output[attack_class.AttackType.Hybrid] = 0
+
+	for type in output:
+		var s = 0
+		var d = 0
+		var raw = 0
+		var adjusted = 0
+		match type:
+			attack_class.AttackType.Physical:
+				s = phys_skill
+				d = phys_diff
+			attack_class.AttackType.Tech:
+				s = tech_skill
+				d = tech_diff
+			attack_class.AttackType.Hybrid:
+				s = hybr_skill
+				d = hybr_diff
+
+		raw = (1.0 + s) / ((1.0 + s) + (1.0 + d))
+		adjusted = 1.0 / (1.0 + exp((raw * -11.0) + 5.0))
+
+		output[type] = floor(clamp(adjusted * 100.0, 1.0, 99.0))
+
+	return output
 
 func evaluate_attack(attack):
 	var stats = evaluate_equipment()
 	if attack.phys_attack_magnitude > 0:
 		attack.phys_attack_magnitude -= stats[2]
+		attack.phys_attack_magnitude = clamp(attack.phys_attack_magnitude, 1, 1000)
 
 	if attack.tech_attack_magnitude > 0:
 		attack.tech_attack_magnitude -= stats[3]
-	
+		attack.tech_attack_magnitude = clamp(attack.tech_attack_magnitude, 1, 1000)

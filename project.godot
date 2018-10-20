@@ -19,6 +19,10 @@ config/auto_accept_quit=false
 
 global_state="*res://assets/scripts/global_state.gd"
 
+[debug]
+
+settings/fps/force_fps=200
+
 [display]
 
 window/size/width=2560

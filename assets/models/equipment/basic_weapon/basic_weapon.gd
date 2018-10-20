@@ -37,6 +37,7 @@ func check_target(object):
 func do_attack(object):
 	var rv = false
 	if object is character:
+		# In a "real" weapon, this would trigger an animation to run
 		print("attacking %s" % character)
 		rv = true
 

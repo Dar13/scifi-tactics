@@ -250,11 +250,17 @@ func handle_attack():
 				selected_char_menu.visible = false
 				selected_char_wep_menu.visible = true
 			character.Phases.AttackConfirm:
+				attack_context.evaluate_hit_chance()
+
+				selected_char_weapon.do_attack(attack_target)
+				# TODO: attack_target.do_attack()
+
+				attack_target.state.apply_attack(attack_context, false)
+				selected_character.state.apply_attack(attack_context, true)
+
 				attack_context.free()
 				attack_context = null
 
-				# TODO: Properly evaluate the attack context here
-				selected_char_weapon.do_attack(attack_target)
 				update_character_phase(selected_character, character.Phases.Done)
 
 func handle_selected_weapon():
