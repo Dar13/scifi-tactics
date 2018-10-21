@@ -10,6 +10,7 @@ enum Types {
 # TODO: Do we need to correlate these to a type?
 enum WeaponNames {
 	BASIC,
+	BASIC_PISTOL,
 }
 
 # The ability of this weapon to express damage physically (boosted by PWR)

@@ -75,7 +75,7 @@ func _ready():
 
 	# Pick first player character for a weapon's test
 	var test_wep = weapon_scene.instance()
-	test_wep.init(weapon_state.WeaponNames.BASIC)
+	test_wep.init(weapon_state.WeaponNames.BASIC_PISTOL)
 	var test_ch = player_team.values()[0]
 	test_ch.add_equipment(test_wep)
 

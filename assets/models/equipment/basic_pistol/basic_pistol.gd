@@ -1,12 +1,12 @@
 extends "res://assets/models/equipment/weapon_base.gd"
 
 func _init():
-	e_name = "Basic Weapon"
-	e_desc = "A weapon so generic it doesn't have a proper description :P"
+	e_name = "Basic Pistol"
+	e_desc = "A pistol so basic it barely qualifies as a weapon..."
 
-	state.attack_range = 1
+	state.attack_range = 5
 
-	state.phys_attack_power = 4
+	state.phys_attack_power = 2
 	state.tech_attack_power = 0
 	
 	# If weapon boosts anything held in equipment_state, set it here
@@ -21,8 +21,15 @@ func _exit_tree():
 	destroy()
 
 func get_attack_pattern(map_pos):
-	var pattern = [map_pos + Vector3(1, 0, 0), map_pos + Vector3(-1, 0, 0),
-				   map_pos + Vector3(0, 0, 1), map_pos + Vector3(0, 0, -1)]
+	var pattern = []
+	for x in range(-state.attack_range, state.attack_range):
+		for z in range(-state.attack_range, state.attack_range):
+			if x == 0 and z == 0:
+				continue
+
+			var pos = map_pos + Vector3(x, 0, z)
+			pattern.append(pos)
+
 	return pattern
 
 func do_special_effect(character):
