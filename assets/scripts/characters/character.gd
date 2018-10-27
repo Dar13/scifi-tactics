@@ -29,6 +29,7 @@ var movement_path = []
 
 # Private vars (Don't use these unless you're in a method)
 var _oriented = false
+var _move_speed = 5
 
 func _ready():
 	pass
@@ -59,7 +60,7 @@ func _process(delta):
 			target_world_pos.y += 2
 
 			var direction = (target_world_pos - self.translation)
-			direction = (direction.normalized() * 2) * delta
+			direction = (direction.normalized() * _move_speed) * delta
 			translate(direction)
 
 			# Snap to the final position if we're close enough
