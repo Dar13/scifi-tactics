@@ -10,6 +10,7 @@ var character_dir = load("res://assets/scripts/characters/character_direction.gd
 var character_stats = load("res://assets/scenes/gui/character_stat_panel.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
 var character_weapon_select_menu = load("res://assets/scenes/character_weapon_select_gui.tscn")
+var character_ability_select_menu = load("res://assets/scenes/character_ability_select_gui.tscn")
 var character_direction_arrows = load("res://assets/models/characters/character_direction_arrow/character_dir_arrows.tscn")
 var attack_confirm_menu = load("res://assets/scenes/character_attack_gui.tscn")
 var attack_preview_menu = load("res://assets/scenes/gui/character_attack_preview.tscn")
@@ -24,6 +25,7 @@ var selected_char_original_pos = Vector3(0,0,0)
 var selected_char_original_direction = null
 var selected_char_menu = null
 var selected_char_wep_menu = null
+var selected_char_abi_menu = null
 var selected_char_weapon = null
 
 var attack_target = null
@@ -69,6 +71,7 @@ func _ready():
 	selected_char_menu = character_action_menu.instance()
 	selected_char_menu.visible = false
 	selected_char_menu.get_attack_btn().connect("pressed", self, "handle_attack")
+	selected_char_menu.get_ability_btn().connect("pressed", self, "handle_ability")
 	selected_char_menu.get_cancel_btn().connect("pressed", self, "handle_cancel")
 	selected_char_menu.get_standby_btn().connect("pressed", self, "handle_standby")
 	call_deferred("add_child", selected_char_menu)
@@ -77,6 +80,11 @@ func _ready():
 	selected_char_wep_menu.visible = false
 	selected_char_wep_menu.connect("weapon_selected", self, "handle_selected_weapon")
 	add_child(selected_char_wep_menu)
+
+	selected_char_abi_menu = character_ability_select_menu.instance()
+	selected_char_abi_menu.visible = false
+	selected_char_abi_menu.connect("ability_selected", self, "handle_selected_ability")
+	add_child(selected_char_abi_menu)
 
 	selected_char_attack_confirm.visible = false
 	selected_char_attack_confirm.connect("cancelled", self, "handle_cancel")
@@ -101,6 +109,7 @@ func _exit_tree():
 
 	selected_char_menu.free()
 	selected_char_wep_menu.free()
+	selected_char_abi_menu.free()
 	selected_char_attack_confirm.free()
 	selected_char_attack_preview.free()
 	char_stats_menu.free()
@@ -235,7 +244,7 @@ func handle_cancel():
 			character.Phases.Action:
 				restore_original()
 				update_character_phase(selected_character, character.Phases.Selected)
-			character.Phases.AttackWeapon:
+			character.Phases.AttackWeapon, character.Phases.AttackAbility:
 				hide_char_tiles()
 				update_character_phase(selected_character, character.Phases.Action)
 			character.Phases.AttackConfirm:
@@ -245,12 +254,19 @@ func handle_cancel():
 				char_dir_arrows.hide()
 				update_character_phase(selected_character, character.Phases.Action)
 
+func handle_ability():
+	if selected_character and selected_character.current_phase == character.Phases.Action:
+		print("TODO: handle_ability")
+		pass
+	else:
+		print("ERROR: Invalid call to handle_ability(), meant for ability button selection only!")
+
 func handle_attack():
 	if selected_character:
 		match selected_character.current_phase:
 			character.Phases.Action:
 				selected_char_wep_menu.set_weapons(selected_character.state.inventory)
-				selected_char_menu.visible = false
+				selected_char_menu.hide()
 				selected_char_wep_menu.visible = true
 			character.Phases.AttackConfirm:
 				attack_context.evaluate_hit_chance()
@@ -265,6 +281,10 @@ func handle_attack():
 				attack_context = null
 
 				update_character_phase(selected_character, character.Phases.Done)
+
+func handle_selected_ability():
+	print("Selected ability: %s" % [selected_char_abi_menu.selected_ability])
+	pass
 
 func handle_selected_weapon():
 	if selected_char_wep_menu.selected_weapon == null:
@@ -315,7 +335,7 @@ func update_character_phase(character, new_state):
 			menu_pos.x -= selected_char_menu.get_global_rect().size.x / 2
 			menu_pos.y += 75
 			selected_char_menu.rect_global_position = menu_pos
-			selected_char_menu.show()
+			selected_char_menu.display(selected_character.state.abilities.size() > 0)
 
 		character.Phases.AttackWeapon:
 			# 1. Get attack pattern based on selected weapon/ability

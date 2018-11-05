@@ -91,6 +91,9 @@ func add_equipment(item):
 	state.add_equipment(item)
 	state.evaluate_initial_stats()
 
+func add_ability(abi):
+	state.add_ability(abi)
+
 # This name suuuuuuckss....
 func set_on_player_team():
 	instance.set_on_player_team()

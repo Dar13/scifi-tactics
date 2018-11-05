@@ -11,6 +11,7 @@ var equip_class = load("res://assets/scripts/characters/equipment.gd")
 
 # Array of equipment on this character
 var inventory = []
+var abilities = []
 var active_weapon = null
 
 enum Classes {
@@ -180,6 +181,9 @@ func add_equipment(item):
 		evaluate_equipment()
 	
 	return rv
+
+func add_ability(abi):
+	abilities.push_back(abi)
 
 func set_active_weapon(wep):
 	var idx = inventory.find(wep)

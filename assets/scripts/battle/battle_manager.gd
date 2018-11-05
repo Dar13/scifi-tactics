@@ -16,6 +16,9 @@ var weapon_state = load("res://assets/scripts/equipment/weapons/weapon_state.gd"
 var equipment_scene = load("res://assets/scenes/equipment.tscn")
 var equipment_state = load("res://assets/scripts/equipment/equipment_state.gd")
 
+var ability_scene = load("res://assets/scenes/ability.tscn")
+var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
+
 var current_team = null
 var player_team = {}
 var enemy_team = {}
@@ -88,6 +91,11 @@ func _ready():
 	var test_vest = equipment_scene.instance()
 	test_vest.init(equipment_state.EquipNames.BASIC_VEST)
 	test_ch.add_equipment(test_vest)
+
+	# And an ability
+	var test_abi = ability_scene.instance()
+	test_abi.init(ability_state.AbilityNames.LASER)
+	test_ch.add_ability(test_abi)
 
 	# Player team starts the battle
 	current_team = player_team
