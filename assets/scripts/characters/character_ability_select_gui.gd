@@ -30,6 +30,7 @@ func set_abilities(abilities):
 			var a_btn = Button.new()
 			a_btn.text = a.get_name()
 			a_btn.icon = a.get_thumbnail()
+			a_btn.hint_tooltip = a.get_description()
 			a_btn.set("ability_object", a)
 			a_btn.connect("pressed", self, "handle_click", [a])
 			add_child(a_btn, true)

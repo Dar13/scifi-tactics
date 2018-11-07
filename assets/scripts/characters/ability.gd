@@ -31,8 +31,20 @@ func get_range_pattern(map_pos):
 func get_selection_pattern(map_pos):
 	return instance.get_selection_pattern(map_pos)
 
+func check_target(object):
+	return instance.check_target(object)
+
 func do_attack(object):
 	return instance.do_attack(object)
 
 func get_state():
 	return instance.get_state()
+
+func get_name():
+	return instance.e_name
+
+func get_description():
+	return instance.e_desc
+
+func get_thumbnail():
+	return instance.thumbnail

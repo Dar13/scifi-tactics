@@ -2,7 +2,7 @@
 
 [ext_resource path="res://assets/scripts/characters/character_attack_gui.gd" type="Script" id=1]
 
-[node name="root" type="Control" index="0"]
+[node name="root" type="Control"]
 
 anchor_left = 0.0
 anchor_top = 0.0

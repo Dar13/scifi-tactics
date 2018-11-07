@@ -35,3 +35,8 @@ func get_range_pattern(map_pos):
 # Single square selection
 func get_selection_pattern(map_pos):
 	return map_pos
+
+func check_target(object):
+	# Lasers don't care about what a target is...
+	# TODO: Unless it's the floor?
+	return true

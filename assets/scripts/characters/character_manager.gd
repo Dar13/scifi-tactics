@@ -27,6 +27,7 @@ var selected_char_menu = null
 var selected_char_wep_menu = null
 var selected_char_abi_menu = null
 var selected_char_weapon = null
+var selected_char_ability = null
 
 var attack_target = null
 var attack_context = null
@@ -62,7 +63,7 @@ func finalize_turn():
 func _ready():
 	# Create some cached instances of move tiles so we don't keep recreating them
 	# Max movement range is 5 for now(lol kinda), so make 10*10 tiles (i.e. [(-5, 0, -5) -> (5, 0, 5)])
-	for i in range(10 * 10):
+	for i in range(20 * 20):
 		character_move_tiles.append(move_tile_scene.instance())
 		
 		# The tiles will conceal themselves when their "_ready" is called
@@ -234,9 +235,12 @@ func handle_click(object):
 func update_attack(tgt):
 	# TODO: Handle selected character current phase being AttackAbility!
 	# 	Easy way would be to make abilities have same base set of functions.
-	if selected_char_weapon.check_target(tgt):
-		attack_target = tgt
+	if (selected_char_weapon and selected_char_weapon.check_target(tgt)) or (selected_char_ability and selected_char_ability.check_target(tgt)):
 		update_character_phase(selected_character, character.Phases.AttackConfirm)
+
+#	if selected_char_weapon.check_target(tgt):
+#		attack_target = tgt
+#		update_character_phase(selected_character, character.Phases.AttackConfirm)
 
 func handle_cancel():
 	if selected_character:
@@ -256,8 +260,10 @@ func handle_cancel():
 
 func handle_ability():
 	if selected_character and selected_character.current_phase == character.Phases.Action:
-		print("TODO: handle_ability")
-		pass
+		#print("TODO: handle_ability")
+		selected_char_abi_menu.set_abilities(selected_character.state.abilities)
+		selected_char_menu.hide()
+		selected_char_abi_menu.show()
 	else:
 		print("ERROR: Invalid call to handle_ability(), meant for ability button selection only!")
 
@@ -283,8 +289,11 @@ func handle_attack():
 				update_character_phase(selected_character, character.Phases.Done)
 
 func handle_selected_ability():
-	print("Selected ability: %s" % [selected_char_abi_menu.selected_ability])
-	pass
+	if selected_char_abi_menu.selected_ability == null:
+		update_character_phase(selected_character, character.Phases.Action)
+	else:
+		selected_char_ability = selected_char_abi_menu.selected_ability
+		update_character_phase(selected_character, character.Phases.AttackAbility)
 
 func handle_selected_weapon():
 	if selected_char_wep_menu.selected_weapon == null:
@@ -315,6 +324,7 @@ func update_character_phase(character, new_state):
 
 	selected_char_menu.hide()
 	selected_char_wep_menu.hide()
+	selected_char_abi_menu.hide()
 	selected_char_attack_confirm.hide()
 	selected_char_attack_preview.hide()
 
@@ -338,40 +348,29 @@ func update_character_phase(character, new_state):
 			selected_char_menu.display(selected_character.state.abilities.size() > 0)
 
 		character.Phases.AttackWeapon:
-			# 1. Get attack pattern based on selected weapon/ability
 			var attack_space = selected_char_weapon.get_attack_pattern(map.get_map_coords(character.translation + Vector3(0, -2, 0)))
+			prepare_for_target_selection(attack_space)
 
-			# 2. Update it against real map geometry
-			for idx in range(0, attack_space.size()):
-				var space_pos = attack_space[idx]
-				var height = map.get_cell_height_if_exists(space_pos)
-				if height == null:
-					space_pos = null
-				else:
-					space_pos.y = height
-
-				attack_space[idx] = space_pos
-
-			# 3. Display
-			display_char_attack_tiles(attack_space)
-
-			# 4. Display the confirm/cancel dialog
-			selected_char_attack_confirm.selection_mode();
-			selected_char_attack_confirm.show()
+		character.Phases.AttackAbility:
+			var attack_space = selected_char_ability.get_range_pattern(map.get_map_coords(character.translation + Vector3(0, -2, 0)))
+			prepare_for_target_selection(attack_space)
 
 		character.Phases.AttackConfirm:
-			selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
-			selected_char_attack_confirm.show()
+			if character.current_phase == character.Phases.AttackAbility:
+				print("TODO: handle attacking with ability!")
+			else:
+				selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
+				selected_char_attack_confirm.show()
 
-			# Rotate attacker towards the defender
-			selected_char_original_direction = selected_character.facing
-			var new_dir = character_dir.look_at(selected_character.translation, attack_target.translation)
-			selected_character.set_direction(new_dir)
+				# Rotate attacker towards the defender
+				selected_char_original_direction = selected_character.facing
+				var new_dir = character_dir.look_at(selected_character.translation, attack_target.translation)
+				selected_character.set_direction(new_dir)
 
-			attack_context = attack_context_type.generate_context(selected_character, attack_target)
+				attack_context = attack_context_type.generate_context(selected_character, attack_target)
 
-			selected_char_attack_preview.populate(attack_context)
-			selected_char_attack_preview.show()
+				selected_char_attack_preview.populate(attack_context)
+				selected_char_attack_preview.show()
 
 		character.Phases.StandbyFacing:
 			char_dir_arrows.set_position(character.translation)
@@ -397,6 +396,26 @@ func update_character_phase(character, new_state):
 		finalize_turn()
 
 	return
+
+func prepare_for_target_selection(attack_space):
+	# Update locations against real map geometry
+	for idx in range(0, attack_space.size()):
+		var space_pos = attack_space[idx]
+		var height = map.get_cell_height_if_exists(space_pos)
+		if height == null:
+			space_pos = null
+		else:
+			space_pos.y = height
+
+		attack_space[idx] = space_pos
+
+	# Display tiles
+	display_char_attack_tiles(attack_space)
+
+	# Display the confirm/cancel dialog
+	selected_char_attack_confirm.selection_mode();
+	selected_char_attack_confirm.show()
+
 
 func display_char_attack_tiles(attack_space_locations):
 	if character == null:
@@ -436,6 +455,6 @@ func display_char_move_tiles(ch, distance):
 	ch.set_movement_space(move_tiles)
 
 func hide_char_tiles():
-	for idx in range(10 * 10):
+	for idx in range(0, character_move_tiles.size()):
 		character_move_tiles[idx].conceal()
 
