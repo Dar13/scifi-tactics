@@ -83,7 +83,7 @@ func evaluate_initial_stats():
 	match character_class:
 		Classes.BASIC:
 			character_class_str = "Basic"
-			health = level * 60
+			health = level * 5
 			max_health = health
 			energy = level * 25
 			max_energy = energy
@@ -177,6 +177,9 @@ func apply_attack(atk_ctx, counter):
 			self.health -= atk_ctx.attacker_info["damage"]
 		else:
 			print("Attack failed")
+
+	if self.health < 0:
+		self.health = 0
 
 
 func add_equipment(item):

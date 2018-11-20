@@ -52,8 +52,13 @@ func prepare_for_battle(all_characters):
 
 func prepare_for_turn(new_characters):
 	current_team = new_characters
+	# Reset selection on team, check for dead characters
 	for c in current_team.values():
 		c.deselect(true)
+
+		if c.state.health == 0:
+			c.current_phase = character.Phases.Done
+
 
 	camera.position.view_target = current_team.values().front().translation
 

@@ -19,9 +19,14 @@ var equipment_state = load("res://assets/scripts/equipment/equipment_state.gd")
 var ability_scene = load("res://assets/scenes/ability.tscn")
 var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
 
+var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
+var battle_win_condition = null
+
 var current_team = null
 var player_team = {}
 var enemy_team = {}
+
+onready var num_turns = 0
 
 onready var fps_label = get_node("../fps_label")
 
@@ -99,6 +104,11 @@ func _ready():
 
 	# Player team starts the battle
 	current_team = player_team
+
+	# TODO: Get this information from the Map Scene or a campaign file or something
+	# Set up the win condition for the battle
+	battle_win_condition = win_condition_class.new(win_condition_class.WinConditions.KILL_LEADER, enemy_team.values()[0], win_condition_class.LossConditions.LEADER_DEAD, player_team.values()[0])
+
 	start_next_turn()
 	return
 
@@ -112,6 +122,8 @@ func _exit_tree():
 
 	for c in player_team.values():
 		c.free()
+	
+	battle_win_condition.free()
 
 # Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
 func evaluate_battlefield():
@@ -131,6 +143,16 @@ func evaluate_battlefield():
 	return
 
 func start_next_turn():
+	if battle_win_condition.evaluate_win(enemy_team, num_turns):
+		# TODO: Make this do things...
+		print("Won the battle!")
+
+	if battle_win_condition.evaluate_loss(player_team, num_turns):
+		# TODO: Make this do things...
+		print("Lost the battle!")
+
+	num_turns += 1
+
 	evaluate_battlefield()
 	character_mgr.prepare_for_turn(current_team)
 	return
