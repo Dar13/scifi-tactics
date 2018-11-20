@@ -26,10 +26,11 @@ var selected_char_original_direction = null
 var selected_char_menu = null
 var selected_char_wep_menu = null
 var selected_char_abi_menu = null
+
 var selected_char_weapon = null
 var selected_char_ability = null
 
-var attack_target = null
+var attack_target = []
 var attack_context = null
 
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
@@ -114,6 +115,7 @@ func _exit_tree():
 	selected_char_attack_confirm.free()
 	selected_char_attack_preview.free()
 	char_stats_menu.free()
+	char_dir_arrows.free()
 
 	if attack_context:
 		attack_context.free()
@@ -233,14 +235,23 @@ func handle_click(object):
 	return
 
 func update_attack(tgt):
-	# TODO: Handle selected character current phase being AttackAbility!
-	# 	Easy way would be to make abilities have same base set of functions.
-	if (selected_char_weapon and selected_char_weapon.check_target(tgt)) or (selected_char_ability and selected_char_ability.check_target(tgt)):
-		update_character_phase(selected_character, character.Phases.AttackConfirm)
+	if selected_char_weapon and selected_char_weapon.check_target(tgt):
+		attack_target = [tgt]
+	elif selected_char_ability and selected_char_ability.check_target(tgt):
+		# TODO: Evaluate selection pattern for targets
+		var select_space = selected_char_ability.get_selection_pattern(map.get_map_coords(tgt.translation + Vector3(0, -2, 0)))
+		prepare_for_target_selection(select_space)
+		for s in select_space:
+			for c in battle_characters.values():
+				var map_coord = map.get_map_coords(c.translation + Vector3(0, -2, 0))
+				if map_coord == s:
+					attack_target.append(c)
+	else:
+		# TODO: Dunno if that's really an error case...
+		#print("update_attack: No selected weapon/ability!")
+		return
 
-#	if selected_char_weapon.check_target(tgt):
-#		attack_target = tgt
-#		update_character_phase(selected_character, character.Phases.AttackConfirm)
+	update_character_phase(selected_character, character.Phases.AttackConfirm)
 
 func handle_cancel():
 	if selected_character:
@@ -253,14 +264,19 @@ func handle_cancel():
 				update_character_phase(selected_character, character.Phases.Action)
 			character.Phases.AttackConfirm:
 				selected_character.set_direction(selected_char_original_direction)
-				update_character_phase(selected_character, character.Phases.AttackWeapon)
+				if selected_char_weapon:
+					update_character_phase(selected_character, character.Phases.AttackWeapon)
+				elif selected_char_ability:
+					update_character_phase(selected_character, character.Phases.AttackAbility)
+				else:
+					print("handle_cancel: How did you get here without a weapon/ability selected??")
+
 			character.Phases.StandbyFacing:
 				char_dir_arrows.hide()
 				update_character_phase(selected_character, character.Phases.Action)
 
 func handle_ability():
 	if selected_character and selected_character.current_phase == character.Phases.Action:
-		#print("TODO: handle_ability")
 		selected_char_abi_menu.set_abilities(selected_character.state.abilities)
 		selected_char_menu.hide()
 		selected_char_abi_menu.show()
@@ -277,10 +293,17 @@ func handle_attack():
 			character.Phases.AttackConfirm:
 				attack_context.evaluate_hit_chance()
 
-				selected_char_weapon.do_attack(attack_target)
-				# TODO: attack_target.do_attack()
+				# TODO: Another location to properly handle multiple attack targets (and the apply_attack below)
+				if selected_char_weapon:
+					selected_char_weapon.do_attack(attack_target[0])
+				elif selected_char_ability:
+					selected_char_ability.do_attack(attack_target[0])
+				else:
+					print("handle_attack: Attack confirmed without a weapon/ability?!")
 
-				attack_target.state.apply_attack(attack_context, false)
+				# TODO: Counter-attack animation/effects (e.g. attack_target.do_attack() )
+
+				attack_target[0].state.apply_attack(attack_context, false)
 				selected_character.state.apply_attack(attack_context, true)
 
 				attack_context.free()
@@ -356,21 +379,22 @@ func update_character_phase(character, new_state):
 			prepare_for_target_selection(attack_space)
 
 		character.Phases.AttackConfirm:
+			selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target[0].translation));
+			selected_char_attack_confirm.show()
+
+			# Rotate attacker towards the defender
+			selected_char_original_direction = selected_character.facing
+			var new_dir = character_dir.look_at(selected_character.translation, attack_target[0].translation)
+			selected_character.set_direction(new_dir)
+
+			# TODO: Handle multiple attack targets. Requires multiple attack contexts with relevant GUI modifications
 			if character.current_phase == character.Phases.AttackAbility:
-				print("TODO: handle attacking with ability!")
+				attack_context = attack_context_type.generate_context(selected_character, attack_target[0], selected_char_ability)
 			else:
-				selected_char_attack_confirm.confirmation_mode(camera.unproject_position(attack_target.translation));
-				selected_char_attack_confirm.show()
+				attack_context = attack_context_type.generate_context(selected_character, attack_target[0], selected_char_weapon)
 
-				# Rotate attacker towards the defender
-				selected_char_original_direction = selected_character.facing
-				var new_dir = character_dir.look_at(selected_character.translation, attack_target.translation)
-				selected_character.set_direction(new_dir)
-
-				attack_context = attack_context_type.generate_context(selected_character, attack_target)
-
-				selected_char_attack_preview.populate(attack_context)
-				selected_char_attack_preview.show()
+			selected_char_attack_preview.populate(attack_context)
+			selected_char_attack_preview.show()
 
 		character.Phases.StandbyFacing:
 			char_dir_arrows.set_position(character.translation)

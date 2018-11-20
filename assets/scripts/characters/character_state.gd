@@ -7,6 +7,7 @@ extends Node
 
 var attack_class = load("res://assets/scripts/battle/attack.gd")
 var weapon_class = load("res://assets/scripts/characters/weapon.gd")
+var ability_class = load("res://assets/scripts/characters/ability.gd")
 var equip_class = load("res://assets/scripts/characters/equipment.gd")
 
 # Array of equipment on this character
@@ -72,6 +73,10 @@ func destroy():
 		i.destroy()
 		i.free()
 
+	for a in abilities:
+		a.destroy()
+		a.free()
+
 # Should be called when creating the character, recreates character stats based on class and equipment
 # Relies on level being initialized already (TODO: pass it in?)
 func evaluate_initial_stats():
@@ -122,19 +127,20 @@ func evaluate_equipment():
 
 	# Determine:
 	#	* active weapon (if null)
-	#	* character attack power
+	#	* character attack power based upon weapon
 	#	* equipment defense bonus
 	for e in inventory:
 		if e is weapon_class:
 			if active_weapon == null:
 				active_weapon = e
 
-			if active_weapon == e:
-				phys_atk_contrib = active_weapon.get_state().phys_attack_power
-				tech_atk_contrib = active_weapon.get_state().tech_attack_power
 		elif e is equip_class:
 			phys_def += e.get_state().armor_value
 			tech_def += e.get_state().disruption_value
+
+	if active_weapon:
+		phys_atk_contrib = active_weapon.get_state().atk_power(self)[0]
+		tech_atk_contrib = active_weapon.get_state().atk_power(self)[1]
 
 	if phys_atk_contrib > 0:
 		phys_atk += phys_atk_contrib
@@ -192,10 +198,17 @@ func set_active_weapon(wep):
 	else:
 		active_weapon = wep	# TODO: Or `active_weapon = inventory[idx]`?
 
-func generate_attack():
+func generate_attack(instrument):
 	# Evaluate equipment to generate an attack object
 	# TODO: Replace these stats magic numbers with proper constants
 	# TODO: Get status scaling from evaluate_equipment()?
+	if instrument == null:
+		instrument = active_weapon
+	elif instrument is weapon_class or instrument is ability_class:
+		active_weapon = instrument
+	else:
+		print("generate_attack: Non-weapon/non-ability provided = %s" % instrument)
+
 	var stats = evaluate_equipment()
 	var atk = attack_class.new(stats[4], stats[0], stats[1], 1.0)
 	return atk

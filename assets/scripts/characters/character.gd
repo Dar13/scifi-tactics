@@ -14,6 +14,7 @@ signal update_phase(character, new_phase)
 
 var character_state = load("res://assets/scripts/characters/character_state.gd")
 var character_direction = load("res://assets/scripts/characters/character_direction.gd")
+
 var state = null
 
 var class_instances = {

@@ -8,10 +8,10 @@ var attacker_info = {}
 var defender = null
 var defender_info = {}
 
-static func generate_context(atk_char, def_char):
+static func generate_context(atk_char, def_char, selected_instrument):
 	var ctx = new()
 
-	var atk = atk_char.state.generate_attack()
+	var atk = atk_char.state.generate_attack(selected_instrument)
 	def_char.state.evaluate_attack(atk)
 
 	var atk_rates = atk_char.state.get_hit_rate(def_char)
@@ -29,6 +29,7 @@ static func generate_context(atk_char, def_char):
 
 	# This may not be correct when using ranged combat.
 	# But for now, it'll do.
+	# TODO: This is the cause for issue #12
 	var counter_possible = (atk_char.facing != def_char.facing)
 
 	ctx.defender = def_char
@@ -39,7 +40,7 @@ static func generate_context(atk_char, def_char):
 			"energy_max": ctx.defender.state.max_energy}
 
 	if counter_possible:
-		var counter = def_char.state.generate_attack()
+		var counter = def_char.state.generate_attack(null)
 		atk_char.state.evaluate_attack(counter)
 
 		var counter_rates = def_char.state.get_hit_rate(atk_char)

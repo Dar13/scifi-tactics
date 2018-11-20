@@ -25,5 +25,8 @@ var attack_range = 0
 func _init():
 	._init()
 
+func atk_power(char_state):
+	return [phys_attack_power, tech_attack_power]
+
 func _ready():
 	pass
