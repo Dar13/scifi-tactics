@@ -59,10 +59,13 @@ func prepare_for_turn(new_characters):
 		if c.state.health == 0:
 			c.current_phase = character.Phases.Done
 
-
 	camera.position.view_target = current_team.values().front().translation
 
 func finalize_turn():
+	# Per-turn increments and effect evaluations
+	for c in current_team.values():
+		c.state.evaluate_turn_end()
+
 	emit_signal("turn_done")
 
 # Initialize the character manager

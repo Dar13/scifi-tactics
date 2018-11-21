@@ -85,10 +85,12 @@ func evaluate_initial_stats():
 			character_class_str = "Basic"
 			health = level * 5
 			max_health = health
-			energy = level * 25
-			max_energy = energy
+
 			start_energy = 5
+			max_energy = level * 25
+			energy = start_energy
 			energy_gain = 5
+
 			armor = 4
 			disruption = 3
 			stealth = 1
@@ -158,7 +160,11 @@ func evaluate_equipment():
 
 # Called after every turn, used for temporary effects (ENG increment, turn-based increases to PWR/SKL/EPT/etc)
 func evaluate_turn_end():
-	print("TODO: evaluate_turn_end()")
+	# If not dead...
+	if health > 0:
+		energy += energy_gain
+		if energy > max_energy:
+			energy = max_energy
 
 # Called when character defeats another, determines experience gain and performs level-up if appropriate
 func increment_experience(enemy_level, enemy_class):
