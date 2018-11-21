@@ -7,6 +7,7 @@ func _init():
 	e_desc = "A high-powered laser, capable of burning through almost anything if given enough time."
 
 	state.ability_range = 7
+	state.energy_requirement = 6
 
 	state.type = state.AbilityType.Missile
 	state.category = state.AbilityCategory.Cybernetic

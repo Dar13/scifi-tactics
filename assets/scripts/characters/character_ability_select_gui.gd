@@ -16,7 +16,7 @@ func handle_click(ability):
 	selected_ability = ability
 	emit_signal("ability_selected")
 
-func set_abilities(abilities):
+func set_abilities(energy_level, abilities):
 	# Clear all children (aka old abilities) first
 	for child in get_children():
 		if child is Button && child.text == "Cancel":
@@ -33,4 +33,6 @@ func set_abilities(abilities):
 			a_btn.hint_tooltip = a.get_description()
 			a_btn.set("ability_object", a)
 			a_btn.connect("pressed", self, "handle_click", [a])
+			a_btn.disabled = a.get_state().energy_requirement > energy_level
+
 			add_child(a_btn, true)

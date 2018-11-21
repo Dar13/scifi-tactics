@@ -285,7 +285,7 @@ func handle_cancel():
 
 func handle_ability():
 	if selected_character and selected_character.current_phase == character.Phases.Action:
-		selected_char_abi_menu.set_abilities(selected_character.state.abilities)
+		selected_char_abi_menu.set_abilities(selected_character.state.energy, selected_character.state.abilities)
 		selected_char_menu.hide()
 		selected_char_abi_menu.show()
 	else:
