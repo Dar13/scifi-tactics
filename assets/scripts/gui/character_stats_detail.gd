@@ -20,6 +20,9 @@ onready var energy_bar = get_node("overview/info_container/meta_col/energy_bar")
 onready var inv_item_list = get_node("tabs/Inventory/item_container/items")
 onready var inv_item_desc = get_node("tabs/Inventory/item_desc_panel/desc_layout/desc_content")
 
+onready var abi_list = get_node("tabs/Abilities/ability_container/abilities")
+onready var abi_desc = get_node("tabs/Abilities/abi_desc_panel/desc_layout/desc_content")
+
 var curr_char = null
 
 func _ready():
@@ -57,9 +60,16 @@ func fill(c):
 
 	# Add this character's abilities to the ability list
 	for abi in c.state.abilities:
-		print("TODO: fill inventory with abilities")
+		var detail = item_detail.instance()
+		detail.get_node("hbox/item_name").text = abi.get_name()
+		detail.get_node("hbox/icon").texture = abi.get_thumbnail()
+		abi_list.add_child(detail)
+		detail.get_node("hbox/item_name").connect("pressed", self, "abi_set_desc", [abi])
 	
 	curr_char = c
 
 func inv_set_desc(item):
 	inv_item_desc.text = item.get_description()
+
+func abi_set_desc(abi):
+	abi_desc.text = abi.get_description()

@@ -1,5 +1,7 @@
 extends "res://assets/models/equipment/weapon_base.gd"
 
+var utils = load("res://assets/scripts/utils/utils.gd")
+
 func _init():
 	e_name = "Basic Pistol"
 	e_desc = "A pistol so basic it barely qualifies as a weapon..."
@@ -21,16 +23,7 @@ func _exit_tree():
 	destroy()
 
 func get_attack_pattern(map_pos):
-	var pattern = []
-	for x in range(-state.attack_range, state.attack_range):
-		for z in range(-state.attack_range, state.attack_range):
-			if x == 0 and z == 0:
-				continue
-
-			var pos = map_pos + Vector3(x, 0, z)
-			pattern.append(pos)
-
-	return pattern
+	return utils.generate_diamond(map_pos, true, state.attack_range)
 
 func do_special_effect(character):
 	print("derived do_special_effect called!")
