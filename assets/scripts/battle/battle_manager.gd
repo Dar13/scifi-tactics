@@ -22,6 +22,8 @@ var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
 var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
 var battle_win_condition = null
 
+var party_class = load("res://assets/scripts/campaign/party.gd")
+
 var current_team = null
 var player_team = {}
 var enemy_team = {}
@@ -41,17 +43,30 @@ func _ready():
 	character_mgr.connect("turn_done", self, "finish_turn")
 	
 	# Initialize the battle scene
-	# For now this means, spawn the teams
-	
-	# Setup the 'player' team
-	var test_positions = [Vector3(0, 2, 10), Vector3(2, 2, 8), Vector3(-2, 2, 8)]
+	# For now this means, create a player and enemy party and set them in some
+	# default way.
+	var player_party = party_class.new()	# Eventually this will come from external source
 	for i in range(3):
 		var state = character_state.new()
 		state.init(character_state.Classes.BASIC)
 		state.level_up()
 
+		player_party.add_character(state)
+
+	var enemy_party = party_class.new()	# Eventually this will come from external source
+	for i in range(3):
+		var state = character_state.new()
+		state.init(character_state.Classes.BASIC)
+		state.level_up()
+
+		enemy_party.add_character(state)
+
+	# Create the player team from the player party
+	# TODO: Get positions/directions from character placement stage of battle
+	var test_positions = [Vector3(0, 2, 10), Vector3(2, 2, 8), Vector3(-2, 2, 8)]
+	for i in range(player_party.size()):
 		var character = character_scene.instance()
-		character.init(state, test_positions[i], true, character_dir.CharDirections.East)
+		character.init(player_party.get(i), test_positions[i], true, character_dir.CharDirections.East)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		character.set_on_player_team()
 		
@@ -59,15 +74,13 @@ func _ready():
 
 		player_team[character.get_collider().get_instance_id()] = character
 
-	# Setup the 'enemy' team
+	# Create the enemy team from the enemy party
+	# TODO: Get positions/directions from character placement stage of battle (for enemies
+	# 	this is from the campaign scenario or the random battle information)
 	test_positions = [Vector3(-4, 2, -8), Vector3(0, 2, -8), Vector3(-8, 4, -8)]
-	for i in range(3):
-		var state = character_state.new()
-		state.init(character_state.Classes.BASIC)
-		state.level_up()
-		
+	for i in range(enemy_party.size()):
 		var character = character_scene.instance()
-		character.init(state, test_positions[i], true, character_dir.CharDirections.West)
+		character.init(enemy_party.get(i), test_positions[i], true, character_dir.CharDirections.West)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
 
