@@ -73,8 +73,8 @@ func _process(delta):
 
 func init(char_state, initial_position, initial_show, direction):
 	state = char_state
-	
-	state.evaluate_initial_stats()
+
+	state.prepare()
 	add_child(state)
 
 	instance = class_instances[state.character_class].instance()
@@ -84,13 +84,12 @@ func init(char_state, initial_position, initial_show, direction):
 		instance.show()
 	else:
 		instance.hide()
-	
+
 	add_child(instance)
 	set_direction(direction)
 
 func add_equipment(item):
 	state.add_equipment(item)
-	state.evaluate_initial_stats()
 
 func add_ability(abi):
 	state.add_ability(abi)

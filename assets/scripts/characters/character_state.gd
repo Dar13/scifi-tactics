@@ -27,7 +27,7 @@ var character_class = Classes.BASIC
 var character_class_str = "Basic"
 
 # Progression attributes
-var level = 1
+var level = 0
 var experience = 0		# Level up occurs at experience == 100
 
 # Aggregate attributes
@@ -36,7 +36,7 @@ var max_health = 0			# Maximum hitpoints of character
 #var health_gain = 0		# TODO: Regenerating health?
 var energy = 0				# Current energy of character, used by abilities and special weapons
 var max_energy = 0			# Max energy of character
-var start_energy = 0		# Starting energy of character at start of battle
+var start_energy = 0			# Starting energy of character at start of battle
 var energy_gain = 0			# Energy gain per turn of character
 var armor = 0				# Modifier on all physical damage taken
 var disruption = 0			# Modifier on all tech damage taken, also has special ability (refer to GDD)
@@ -77,35 +77,30 @@ func destroy():
 		a.destroy()
 		a.free()
 
-# Should be called when creating the character, recreates character stats based on class and equipment
-# Relies on level being initialized already (TODO: pass it in?)
-func evaluate_initial_stats():
+# This only initializes specific internal variables and class-dependent attributes.
+# All other attributes should be initialized elsewhere.
+func init(char_class):
+	character_class = char_class
+
 	match character_class:
 		Classes.BASIC:
 			character_class_str = "Basic"
-			health = level * 5
-			max_health = health
 
 			start_energy = 5
-			max_energy = level * 25
-			energy = start_energy
 			energy_gain = 5
 
-			armor = 4
-			disruption = 3
-			stealth = 1
-			
 			jump_type = JumpType.NORMAL
 			movement_range = 5
-			
-			power = (level * 4)
-			skill = (level * 3)
-			expertise = (level * 2)
 
 			base_phys_attack = 1
 			base_tech_attack = 0
 		_:
-			print("unknown class, all your stats are zero!")
+			character_class_str = "<Unknown>"
+
+# Ensure all attributes are the correct values as if the character was going into battle
+func prepare():
+	health = max_health
+	energy = start_energy
 
 # Evaluates equipment, returning array with these contents:
 #	- Total physical attack magnitude
@@ -169,6 +164,25 @@ func evaluate_turn_end():
 # Called when character defeats another, determines experience gain and performs level-up if appropriate
 func increment_experience(enemy_level, enemy_class):
 	print("TODO: Increment experience. Level: %s, Class %s" % [enemy_level, enemy_class])
+
+func level_up():
+	level += 1
+	experience = 0
+
+	match character_class:
+		Classes.BASIC:
+			max_health += 5
+			max_energy += 25
+
+			armor += 4
+			disruption += 3
+			stealth += 1
+	
+			power += 4
+			skill += 3
+			expertise += 2
+		_:
+			print("ERROR: Unknown class, level up not processed.")
 
 func apply_attack(atk_ctx, counter):
 	if counter:

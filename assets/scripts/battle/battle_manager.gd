@@ -47,8 +47,9 @@ func _ready():
 	var test_positions = [Vector3(0, 2, 10), Vector3(2, 2, 8), Vector3(-2, 2, 8)]
 	for i in range(3):
 		var state = character_state.new()
-		state.character_class = character_state.Classes.BASIC
-		
+		state.init(character_state.Classes.BASIC)
+		state.level_up()
+
 		var character = character_scene.instance()
 		character.init(state, test_positions[i], true, character_dir.CharDirections.East)
 		character.connect("update_phase", character_mgr, "update_character_phase")
@@ -62,7 +63,8 @@ func _ready():
 	test_positions = [Vector3(-4, 2, -8), Vector3(0, 2, -8), Vector3(-8, 4, -8)]
 	for i in range(3):
 		var state = character_state.new()
-		state.character_class = character_state.Classes.BASIC
+		state.init(character_state.Classes.BASIC)
+		state.level_up()
 		
 		var character = character_scene.instance()
 		character.init(state, test_positions[i], true, character_dir.CharDirections.West)
