@@ -18,7 +18,8 @@ var character_direction = load("res://assets/scripts/characters/character_direct
 var state = null
 
 var class_instances = {
-	character_state.Classes.BASIC : load("res://assets/models/characters/basic_character/basic_character.tscn"),
+	#character_state.Classes.BASIC : load("res://assets/models/characters/basic_character/basic_character.tscn"),
+	character_state.Classes.BASIC : load("res://assets/models/characters/basic_human/basic_human.tscn"),
 }
 
 var instance = null
@@ -53,12 +54,12 @@ func _process(delta):
 			if _oriented == false:
 				_oriented = true
 				var tgt = movement_path.front().world_position
-				tgt.y += 2
+				tgt.y += get_visual_bounds().size.y / 2
 				var new_dir = character_direction.look_at(self.translation, tgt)
 				set_direction(new_dir)
 
 			var target_world_pos = movement_path.front().world_position
-			target_world_pos.y += 2
+			target_world_pos.y += 0.5 # The size of the grid map cell
 
 			var direction = (target_world_pos - self.translation)
 			direction = (direction.normalized() * _move_speed) * delta

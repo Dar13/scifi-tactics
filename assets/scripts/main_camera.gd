@@ -10,7 +10,7 @@ class CameraPosition:
 
 	func _init():
 		view_target = Vector3(0, 0, 0)
-		offset = Vector3(8, 10, 8)
+		offset = Vector3(6, 6, 6)
 
 	func update(camera, delta_angle):
 		self.offset = orbit_xz(delta_angle, offset)

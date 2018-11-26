@@ -33,6 +33,8 @@ var selected_char_ability = null
 var attack_target = []
 var attack_context = null
 
+const TILE_OFFSET = 0.65
+
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 onready var selected_char_attack_preview = attack_preview_menu.instance()
 onready var char_dir_arrows = character_direction_arrows.instance()
@@ -71,7 +73,6 @@ func finalize_turn():
 # Initialize the character manager
 func _ready():
 	# Create some cached instances of move tiles so we don't keep recreating them
-	# Max movement range is 5 for now(lol kinda), so make 10*10 tiles (i.e. [(-5, 0, -5) -> (5, 0, 5)])
 	for i in range(20 * 20):
 		character_move_tiles.append(move_tile_scene.instance())
 		
@@ -179,7 +180,6 @@ func click_character(ch):
 
 			character.Phases.AttackWeapon, character.Phases.AttackAbility:
 				var clicked_world_pos = ch.translation
-				clicked_world_pos.y = floor(clicked_world_pos.y - ch.get_visual_bounds().size.y / 2)
 				var clicked_map_coord = map.get_map_coords(clicked_world_pos)
 
 				for tile in character_move_tiles:
@@ -222,7 +222,7 @@ func handle_click(object):
 			var tile_idx = character_move_tiles.find(parent)
 			if tile_idx > -1:
 				var tile_world_pos = character_move_tiles[tile_idx].translation
-				tile_world_pos.y = round(tile_world_pos.y)
+				tile_world_pos.y = floor(tile_world_pos.y - TILE_OFFSET + 0.1) # weird floating-point thing, this turns into -0.0f without the add of 0.1
 				var tile_map_pos = map.get_map_coords(tile_world_pos)
 				# Only process movement if the selected character is on the current team
 				if selected_character && current_team.values().has(selected_character):
@@ -459,7 +459,7 @@ func display_char_attack_tiles(attack_space_locations):
 		if space == null: continue
 		
 		var real_pos = map.get_world_coords(space)
-		real_pos.y += 1.1
+		real_pos.y += TILE_OFFSET
 		
 		character_move_tiles[idx].display(real_pos, Color(1.0, 0.0, 0.0))
 		idx += 1
@@ -470,7 +470,6 @@ func display_char_move_tiles(ch, distance):
 
 	# Calculate the map coordinate the character is at
 	var char_pos = ch.translation
-	char_pos = char_pos + Vector3(0, -2, 0)
 	var char_cell = map.get_map_coords(char_pos)
 	# TODO: Raycast downwards to get precise Y-axis value?
 
@@ -479,7 +478,7 @@ func display_char_move_tiles(ch, distance):
 	var idx = 0
 	for tile in move_tiles:
 		var tile_world_pos = map.get_world_coords(tile.map_position)
-		tile_world_pos.y += 1.1
+		tile_world_pos.y += TILE_OFFSET
 
 		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 1.0))
 		idx += 1

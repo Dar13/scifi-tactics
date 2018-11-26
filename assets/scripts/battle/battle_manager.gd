@@ -63,7 +63,7 @@ func _ready():
 
 	# Create the player team from the player party
 	# TODO: Get positions/directions from character placement stage of battle
-	var test_positions = [Vector3(0, 2, 10), Vector3(2, 2, 8), Vector3(-2, 2, 8)]
+	var test_positions = [Vector3(0, 0.5, 3), Vector3(2, 0.5, 4), Vector3(-2, 0.5, 3)]
 	for i in range(player_party.size()):
 		var character = character_scene.instance()
 		character.init(player_party.get(i), test_positions[i], true, character_dir.CharDirections.East)
@@ -77,7 +77,7 @@ func _ready():
 	# Create the enemy team from the enemy party
 	# TODO: Get positions/directions from character placement stage of battle (for enemies
 	# 	this is from the campaign scenario or the random battle information)
-	test_positions = [Vector3(-4, 2, -8), Vector3(0, 2, -8), Vector3(-8, 4, -8)]
+	test_positions = [Vector3(-2, 0.5, -4), Vector3(0, 0.5, -4), Vector3(2, 0.5, -4)]
 	for i in range(enemy_party.size()):
 		var character = character_scene.instance()
 		character.init(enemy_party.get(i), test_positions[i], true, character_dir.CharDirections.West)
