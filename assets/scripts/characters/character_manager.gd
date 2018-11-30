@@ -3,7 +3,7 @@ extends Node
 signal battlefield_updated
 signal turn_done
 
-var move_tile_scene = load("res://assets/scenes/move_tile.tscn")
+var move_tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
 var move_tile = load("res://assets/scripts/move_tile.gd")
 var character = load("res://assets/scripts/characters/character.gd")
 var character_dir = load("res://assets/scripts/characters/character_direction.gd")
@@ -461,7 +461,7 @@ func display_char_attack_tiles(attack_space_locations):
 		var real_pos = map.get_world_coords(space)
 		real_pos.y += TILE_OFFSET
 		
-		character_move_tiles[idx].display(real_pos, Color(1.0, 0.0, 0.0))
+		character_move_tiles[idx].display(real_pos, Color(1.0, 0.0, 0.0, 0.3))
 		idx += 1
 
 func display_char_move_tiles(ch, distance):
@@ -480,7 +480,7 @@ func display_char_move_tiles(ch, distance):
 		var tile_world_pos = map.get_world_coords(tile.map_position)
 		tile_world_pos.y += TILE_OFFSET
 
-		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 1.0))
+		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 0.3))
 		idx += 1
 	
 	ch.set_movement_space(move_tiles)

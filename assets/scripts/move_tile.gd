@@ -35,7 +35,8 @@ func set_color(new_value):
 	if material is SpatialMaterial:
 		material.albedo_color = new_value
 	else:
-		print("%s Material isn't Spatial, gotta handle the other ones..." % [self])
+		material.set_shader_param("color_influence", Vector3(new_value.r, new_value.g, new_value.b))
+		material.set_shader_param("alpha", new_value.a)
 	
 	pass
 
