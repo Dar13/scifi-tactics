@@ -240,6 +240,12 @@ func handle_click(object):
 			pass	
 		else:
 			print("clicked was unhandled (potentially the map) Collider = %s" % parent)
+	else:
+		if selected_character and selected_character.current_phase == character.Phases.Selected:
+			selected_character.deselect(false)
+			selected_character = null
+			selected_char_original_pos = null
+			hide_char_tiles()
 	return
 
 func update_attack(tgt):

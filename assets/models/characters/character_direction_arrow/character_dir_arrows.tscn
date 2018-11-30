@@ -1,229 +1,62 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://assets/scripts/characters/character_direction_arrows.gd" type="Script" id=1]
 [ext_resource path="res://assets/models/characters/character_direction_arrow/Cube.mesh" type="ArrayMesh" id=2]
+[ext_resource path="res://assets/models/shaders/translucent_pulse.shader" type="Shader" id=3]
 
-[sub_resource type="SpatialMaterial" id=1]
+[sub_resource type="ShaderMaterial" id=10]
 
 render_priority = 0
-flags_transparent = false
-flags_unshaded = false
-flags_vertex_lighting = false
-flags_no_depth_test = false
-flags_use_point_size = false
-flags_world_triplanar = false
-flags_fixed_size = false
-flags_albedo_tex_force_srgb = false
-vertex_color_use_as_albedo = false
-vertex_color_is_srgb = false
-params_diffuse_mode = 0
-params_specular_mode = 0
-params_blend_mode = 0
-params_cull_mode = 0
-params_depth_draw_mode = 0
-params_line_width = 1.0
-params_point_size = 1.0
-params_billboard_mode = 0
-params_grow = false
-params_use_alpha_scissor = false
-albedo_color = Color( 0, 0, 0, 1 )
-metallic = 0.0
-metallic_specular = 0.5
-metallic_texture_channel = 0
-roughness = 0.0
-roughness_texture_channel = 0
-emission_enabled = false
-normal_enabled = false
-rim_enabled = false
-clearcoat_enabled = false
-anisotropy_enabled = false
-ao_enabled = false
-depth_enabled = false
-subsurf_scatter_enabled = false
-transmission_enabled = false
-refraction_enabled = false
-detail_enabled = false
-uv1_scale = Vector3( 1, 1, 1 )
-uv1_offset = Vector3( 0, 0, 0 )
-uv1_triplanar = false
-uv1_triplanar_sharpness = 1.0
-uv2_scale = Vector3( 1, 1, 1 )
-uv2_offset = Vector3( 0, 0, 0 )
-uv2_triplanar = false
-uv2_triplanar_sharpness = 1.0
-proximity_fade_enable = false
-distance_fade_enable = false
-_sections_unfolded = [ "Albedo" ]
+shader = ExtResource( 3 )
+shader_param/enabled = false
+shader_param/base_color = Vector3( 0.1, 0.1, 0.1 )
+shader_param/glow_color = Vector3( 1, 1, 0 )
+shader_param/time_scale = 4.0
+_sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=2]
+[sub_resource type="ConvexPolygonShape" id=3]
 
 points = PoolVector3Array( 0, 0.25, 0, 5, 0.25, -5, 5, -0.25, -5, -5, 0.25, -5, -5, -0.25, -5, 0, -0.25, 0 )
 
-[sub_resource type="SpatialMaterial" id=3]
+[sub_resource type="ShaderMaterial" id=11]
 
 render_priority = 0
-flags_transparent = false
-flags_unshaded = false
-flags_vertex_lighting = false
-flags_no_depth_test = false
-flags_use_point_size = false
-flags_world_triplanar = false
-flags_fixed_size = false
-flags_albedo_tex_force_srgb = false
-vertex_color_use_as_albedo = false
-vertex_color_is_srgb = false
-params_diffuse_mode = 0
-params_specular_mode = 0
-params_blend_mode = 0
-params_cull_mode = 0
-params_depth_draw_mode = 0
-params_line_width = 1.0
-params_point_size = 1.0
-params_billboard_mode = 0
-params_grow = false
-params_use_alpha_scissor = false
-albedo_color = Color( 0, 0, 0, 1 )
-metallic = 0.0
-metallic_specular = 0.5
-metallic_texture_channel = 0
-roughness = 0.0
-roughness_texture_channel = 0
-emission_enabled = false
-normal_enabled = false
-rim_enabled = false
-clearcoat_enabled = false
-anisotropy_enabled = false
-ao_enabled = false
-depth_enabled = false
-subsurf_scatter_enabled = false
-transmission_enabled = false
-refraction_enabled = false
-detail_enabled = false
-uv1_scale = Vector3( 1, 1, 1 )
-uv1_offset = Vector3( 0, 0, 0 )
-uv1_triplanar = false
-uv1_triplanar_sharpness = 1.0
-uv2_scale = Vector3( 1, 1, 1 )
-uv2_offset = Vector3( 0, 0, 0 )
-uv2_triplanar = false
-uv2_triplanar_sharpness = 1.0
-proximity_fade_enable = false
-distance_fade_enable = false
-_sections_unfolded = [ "Albedo" ]
+shader = ExtResource( 3 )
+shader_param/enabled = false
+shader_param/base_color = Vector3( 0.1, 0.1, 0.1 )
+shader_param/glow_color = Vector3( 1, 1, 0 )
+shader_param/time_scale = 4.0
+_sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=9]
+[sub_resource type="ConvexPolygonShape" id=5]
 
 points = PoolVector3Array( 0, 0.25, 0, 5, 0.25, 5, 5, -0.25, 5, -5, 0.25, 5, -5, -0.25, 5, 0, -0.25, 0 )
 
-[sub_resource type="SpatialMaterial" id=5]
+[sub_resource type="ShaderMaterial" id=12]
 
 render_priority = 0
-flags_transparent = false
-flags_unshaded = false
-flags_vertex_lighting = false
-flags_no_depth_test = false
-flags_use_point_size = false
-flags_world_triplanar = false
-flags_fixed_size = false
-flags_albedo_tex_force_srgb = false
-vertex_color_use_as_albedo = false
-vertex_color_is_srgb = false
-params_diffuse_mode = 0
-params_specular_mode = 0
-params_blend_mode = 0
-params_cull_mode = 0
-params_depth_draw_mode = 0
-params_line_width = 1.0
-params_point_size = 1.0
-params_billboard_mode = 0
-params_grow = false
-params_use_alpha_scissor = false
-albedo_color = Color( 0, 0, 0, 1 )
-metallic = 0.0
-metallic_specular = 0.5
-metallic_texture_channel = 0
-roughness = 0.0
-roughness_texture_channel = 0
-emission_enabled = false
-normal_enabled = false
-rim_enabled = false
-clearcoat_enabled = false
-anisotropy_enabled = false
-ao_enabled = false
-depth_enabled = false
-subsurf_scatter_enabled = false
-transmission_enabled = false
-refraction_enabled = false
-detail_enabled = false
-uv1_scale = Vector3( 1, 1, 1 )
-uv1_offset = Vector3( 0, 0, 0 )
-uv1_triplanar = false
-uv1_triplanar_sharpness = 1.0
-uv2_scale = Vector3( 1, 1, 1 )
-uv2_offset = Vector3( 0, 0, 0 )
-uv2_triplanar = false
-uv2_triplanar_sharpness = 1.0
-proximity_fade_enable = false
-distance_fade_enable = false
-_sections_unfolded = [ "Albedo" ]
+shader = ExtResource( 3 )
+shader_param/enabled = false
+shader_param/base_color = Vector3( 0.1, 0.1, 0.1 )
+shader_param/glow_color = Vector3( 1, 1, 0 )
+shader_param/time_scale = 4.0
+_sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=10]
+[sub_resource type="ConvexPolygonShape" id=7]
 
 points = PoolVector3Array( 0, 0.25, 0, 5, 0.25, 5, 5, -0.25, 5, 5, 0.25, -5, 5, -0.25, -5, 0, -0.25, 0 )
 
-[sub_resource type="SpatialMaterial" id=7]
+[sub_resource type="ShaderMaterial" id=13]
 
 render_priority = 0
-flags_transparent = false
-flags_unshaded = false
-flags_vertex_lighting = false
-flags_no_depth_test = false
-flags_use_point_size = false
-flags_world_triplanar = false
-flags_fixed_size = false
-flags_albedo_tex_force_srgb = false
-vertex_color_use_as_albedo = false
-vertex_color_is_srgb = false
-params_diffuse_mode = 0
-params_specular_mode = 0
-params_blend_mode = 0
-params_cull_mode = 0
-params_depth_draw_mode = 0
-params_line_width = 1.0
-params_point_size = 1.0
-params_billboard_mode = 0
-params_grow = false
-params_use_alpha_scissor = false
-albedo_color = Color( 0, 0, 0, 1 )
-metallic = 0.0
-metallic_specular = 0.5
-metallic_texture_channel = 0
-roughness = 0.0
-roughness_texture_channel = 0
-emission_enabled = false
-normal_enabled = false
-rim_enabled = false
-clearcoat_enabled = false
-anisotropy_enabled = false
-ao_enabled = false
-depth_enabled = false
-subsurf_scatter_enabled = false
-transmission_enabled = false
-refraction_enabled = false
-detail_enabled = false
-uv1_scale = Vector3( 1, 1, 1 )
-uv1_offset = Vector3( 0, 0, 0 )
-uv1_triplanar = false
-uv1_triplanar_sharpness = 1.0
-uv2_scale = Vector3( 1, 1, 1 )
-uv2_offset = Vector3( 0, 0, 0 )
-uv2_triplanar = false
-uv2_triplanar_sharpness = 1.0
-proximity_fade_enable = false
-distance_fade_enable = false
-_sections_unfolded = [ "Albedo" ]
+shader = ExtResource( 3 )
+shader_param/enabled = false
+shader_param/base_color = Vector3( 0.1, 0.1, 0.1 )
+shader_param/glow_color = Vector3( 1, 1, 0 )
+shader_param/time_scale = 4.0
+_sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=11]
+[sub_resource type="ConvexPolygonShape" id=9]
 
 points = PoolVector3Array( 0, 0.25, 0, -5, 0.25, -5, -5, -0.25, -5, -5, 0.25, 5, -5, -0.25, 5, 0, -0.25, 0 )
 
@@ -248,7 +81,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 1 )
+material/0 = SubResource( 10 )
 _sections_unfolded = [ "Geometry", "Transform", "material" ]
 
 [node name="body" type="StaticBody" parent="arrows/east_arrow" index="0"]
@@ -265,7 +98,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/east_arrow/body" index="0"]
 
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2 )
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 
@@ -283,7 +116,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 3 )
+material/0 = SubResource( 11 )
 _sections_unfolded = [ "Geometry", "material" ]
 
 [node name="body" type="StaticBody" parent="arrows/west_arrow" index="0"]
@@ -300,7 +133,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/west_arrow/body" index="0"]
 
 transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -1.74846e-07, 0, 2 )
-shape = SubResource( 9 )
+shape = SubResource( 5 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 
@@ -318,7 +151,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 5 )
+material/0 = SubResource( 12 )
 _sections_unfolded = [ "Geometry", "Transform", "material" ]
 
 [node name="body" type="StaticBody" parent="arrows/south_arrow" index="0"]
@@ -335,7 +168,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/south_arrow/body" index="0"]
 
 transform = Transform( 1.31134e-07, 0, 1, 0, 1, 0, -1, 0, 1.31134e-07, -2.62268e-07, 0, 2 )
-shape = SubResource( 10 )
+shape = SubResource( 7 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 
@@ -353,7 +186,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 7 )
+material/0 = SubResource( 13 )
 _sections_unfolded = [ "Geometry", "LOD", "Transform", "material" ]
 
 [node name="mesh" type="StaticBody" parent="arrows/north_arrow" index="0"]
@@ -370,7 +203,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/north_arrow/mesh" index="0"]
 
 transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -8.74228e-08, 0, 2 )
-shape = SubResource( 11 )
+shape = SubResource( 9 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 

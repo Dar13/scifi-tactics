@@ -6,7 +6,6 @@
 *.res
 *.meshlib
 *.mesh
-*.material
 *.dae
 .import/
 *.import

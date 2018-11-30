@@ -58,6 +58,12 @@ func highlight_arrow(obj):
 	for o in arrows.get_children():
 		var mat = o.get_surface_material(0)
 		if o == obj:
-			mat.albedo_color = Color(1.0, 1.0, 0.0, 1.0)
+			if mat is SpatialMaterial:
+				mat.albedo_color = Color(1.0, 1.0, 0.0, 1.0)
+			else:
+				mat.set_shader_param("enabled", true)
 		else:
-			mat.albedo_color = Color(0.0, 0.0, 0.0, 1.0)
+			if mat is SpatialMaterial:
+				mat.albedo_color = Color(0.0, 0.0, 0.0, 1.0)
+			else:
+				mat.set_shader_param("enabled", false)
