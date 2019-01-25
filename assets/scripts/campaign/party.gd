@@ -11,6 +11,10 @@ var character_state_class = load("res://assets/scripts/characters/character_stat
 
 var characters = []
 
+func _notification(what):
+	# Put any explicit destructor-like clean-up here
+	pass
+
 func add_character(state):
 	characters.append(state)
 

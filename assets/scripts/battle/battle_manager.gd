@@ -23,6 +23,8 @@ var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
 var battle_win_condition = null
 
 var party_class = load("res://assets/scripts/campaign/party.gd")
+var player_party = null
+var enemy_party = null
 
 var current_team = null
 var player_team = {}
@@ -52,7 +54,7 @@ func _ready():
 	# Initialize the battle scene
 	# For now this means, create a player and enemy party and set them in some
 	# default way.
-	var player_party = party_class.new()	# Eventually this will come from external source
+	player_party = party_class.new()	# Eventually this will come from external source
 	for i in range(3):
 		var state = character_state.new()
 		state.init(character_state.Classes.BASIC)
@@ -60,7 +62,7 @@ func _ready():
 
 		player_party.add_character(state)
 
-	var enemy_party = party_class.new()	# Eventually this will come from external source
+	enemy_party = party_class.new()	# Eventually this will come from external source
 	for i in range(3):
 		var state = character_state.new()
 		state.init(character_state.Classes.BASIC)
@@ -144,6 +146,12 @@ func _exit_tree():
 
 	for c in player_team.values():
 		c.free()
+
+	if player_party:
+		player_party.free()
+
+	if enemy_party:
+		enemy_party.free()
 	
 	battle_win_condition.free()
 
