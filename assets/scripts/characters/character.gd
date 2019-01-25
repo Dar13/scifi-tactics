@@ -67,7 +67,7 @@ func _process(delta):
 
 			# Snap to the final position if we're close enough
 			var distance = self.translation.distance_to(target_world_pos)
-			if distance <= 0.01:
+			if distance <= 0.025:
 				set_position(target_world_pos)
 				movement_path.pop_front()
 				_oriented = false

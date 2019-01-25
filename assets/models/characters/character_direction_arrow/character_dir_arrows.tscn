@@ -4,7 +4,7 @@
 [ext_resource path="res://assets/models/characters/character_direction_arrow/Cube.mesh" type="ArrayMesh" id=2]
 [ext_resource path="res://assets/models/shaders/translucent_pulse.shader" type="Shader" id=3]
 
-[sub_resource type="ShaderMaterial" id=10]
+[sub_resource type="ShaderMaterial" id=1]
 
 render_priority = 0
 shader = ExtResource( 3 )
@@ -14,11 +14,11 @@ shader_param/glow_color = Vector3( 1, 1, 0 )
 shader_param/time_scale = 4.0
 _sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=3]
+[sub_resource type="ConvexPolygonShape" id=2]
 
 points = PoolVector3Array( 0, 0.25, 0, 5, 0.25, -5, 5, -0.25, -5, -5, 0.25, -5, -5, -0.25, -5, 0, -0.25, 0 )
 
-[sub_resource type="ShaderMaterial" id=11]
+[sub_resource type="ShaderMaterial" id=3]
 
 render_priority = 0
 shader = ExtResource( 3 )
@@ -28,11 +28,11 @@ shader_param/glow_color = Vector3( 1, 1, 0 )
 shader_param/time_scale = 4.0
 _sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=5]
+[sub_resource type="ConvexPolygonShape" id=4]
 
 points = PoolVector3Array( 0, 0.25, 0, 5, 0.25, 5, 5, -0.25, 5, -5, 0.25, 5, -5, -0.25, 5, 0, -0.25, 0 )
 
-[sub_resource type="ShaderMaterial" id=12]
+[sub_resource type="ShaderMaterial" id=5]
 
 render_priority = 0
 shader = ExtResource( 3 )
@@ -42,11 +42,11 @@ shader_param/glow_color = Vector3( 1, 1, 0 )
 shader_param/time_scale = 4.0
 _sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=7]
+[sub_resource type="ConvexPolygonShape" id=6]
 
 points = PoolVector3Array( 0, 0.25, 0, 5, 0.25, 5, 5, -0.25, 5, 5, 0.25, -5, 5, -0.25, -5, 0, -0.25, 0 )
 
-[sub_resource type="ShaderMaterial" id=13]
+[sub_resource type="ShaderMaterial" id=7]
 
 render_priority = 0
 shader = ExtResource( 3 )
@@ -56,11 +56,11 @@ shader_param/glow_color = Vector3( 1, 1, 0 )
 shader_param/time_scale = 4.0
 _sections_unfolded = [ "shader_param" ]
 
-[sub_resource type="ConvexPolygonShape" id=9]
+[sub_resource type="ConvexPolygonShape" id=8]
 
 points = PoolVector3Array( 0, 0.25, 0, -5, 0.25, -5, -5, -0.25, -5, -5, 0.25, 5, -5, -0.25, 5, 0, -0.25, 0 )
 
-[node name="center" type="Node" index="0"]
+[node name="center" type="Node"]
 
 script = ExtResource( 1 )
 _sections_unfolded = [ "Transform", "Visibility" ]
@@ -81,7 +81,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 10 )
+material/0 = SubResource( 1 )
 _sections_unfolded = [ "Geometry", "Transform", "material" ]
 
 [node name="body" type="StaticBody" parent="arrows/east_arrow" index="0"]
@@ -98,7 +98,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/east_arrow/body" index="0"]
 
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2 )
-shape = SubResource( 3 )
+shape = SubResource( 2 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 
@@ -116,7 +116,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 11 )
+material/0 = SubResource( 3 )
 _sections_unfolded = [ "Geometry", "material" ]
 
 [node name="body" type="StaticBody" parent="arrows/west_arrow" index="0"]
@@ -133,7 +133,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/west_arrow/body" index="0"]
 
 transform = Transform( -1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -1.74846e-07, 0, 2 )
-shape = SubResource( 5 )
+shape = SubResource( 4 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 
@@ -151,7 +151,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 12 )
+material/0 = SubResource( 5 )
 _sections_unfolded = [ "Geometry", "Transform", "material" ]
 
 [node name="body" type="StaticBody" parent="arrows/south_arrow" index="0"]
@@ -168,7 +168,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/south_arrow/body" index="0"]
 
 transform = Transform( 1.31134e-07, 0, 1, 0, 1, 0, -1, 0, 1.31134e-07, -2.62268e-07, 0, 2 )
-shape = SubResource( 7 )
+shape = SubResource( 6 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 
@@ -186,7 +186,7 @@ lod_max_distance = 0.0
 lod_max_hysteresis = 0.0
 mesh = ExtResource( 2 )
 skeleton = NodePath("..")
-material/0 = SubResource( 13 )
+material/0 = SubResource( 7 )
 _sections_unfolded = [ "Geometry", "LOD", "Transform", "material" ]
 
 [node name="mesh" type="StaticBody" parent="arrows/north_arrow" index="0"]
@@ -203,7 +203,7 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 [node name="col_shape" type="CollisionShape" parent="arrows/north_arrow/mesh" index="0"]
 
 transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -8.74228e-08, 0, 2 )
-shape = SubResource( 9 )
+shape = SubResource( 8 )
 disabled = false
 _sections_unfolded = [ "Transform" ]
 

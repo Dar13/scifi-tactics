@@ -38,6 +38,13 @@ func _ready():
 	map.name = "map"	# We don't care what the scene we instanced calls itself
 	add_child(map)
 
+	# TODO: Use this for the "character placement" phase
+	#print("Player placement zone:")
+	#print(map.get_player_placement_positions())
+	#print("---")
+	#print("Enemy placement zone:")
+	#print(map.get_enemy_placement_positions())
+
 	add_child(character_mgr)
 	character_mgr.connect("battlefield_updated", self, "evaluate_battlefield")
 	character_mgr.connect("turn_done", self, "finish_turn")

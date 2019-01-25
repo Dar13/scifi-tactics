@@ -3,6 +3,8 @@ extends Spatial
 var tile_class = load("res://assets/scripts/maps/tile.gd")
 
 onready var grid = get_node("./grid")
+onready var player_area = get_node("./player_placement_area")
+onready var enemy_area = get_node("./enemy_placement_area")
 
 # Key is Vector2(X,Z) coordinate, Value is GridGraphNode
 var grid_graph = {}
@@ -59,7 +61,38 @@ func _ready():
 					highest_y = y
 
 			grid_graph[Vector2(x, z)] = GridGraphNode.new(grid, Vector3(x, highest_y, z))
-	pass
+
+	# Make sure hidden areas are actually invisible
+	player_area.hide()
+	enemy_area.hide()
+
+func get_player_placement_positions():
+	var positions = []
+	if player_area:
+		var area = player_area.get_transformed_aabb()
+		for x in range(area.position.x, area.end.x):
+			for z in range(area.position.z, area.end.z):
+				if grid_graph.has(Vector2(x, z)):
+					positions.append(grid_graph[Vector2(x,z)].position)
+	else:
+		# TODO: All the map instead?
+		pass
+
+	return positions
+
+func get_enemy_placement_positions():
+	var positions = []
+	if enemy_area:
+		var area = enemy_area.get_transformed_aabb()
+		for x in range(area.position.x, area.end.x):
+			for z in range(area.position.z, area.end.z):
+				if grid_graph.has(Vector2(x, z)):
+					positions.append(grid_graph[Vector2(x,z)].position)
+	else:
+		# TODO: All the map instead?
+		pass
+
+	return positions
 
 #func _process(delta):
 #	# Called every frame. Delta is time since last frame.
