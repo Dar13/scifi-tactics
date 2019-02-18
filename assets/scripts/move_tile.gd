@@ -1,5 +1,7 @@
 extends MeshInstance
 
+const TILE_OFFSET = 0.65
+
 var material = null
 var color = Color(0.0, 0.0, 0.0, 1.0) setget set_color,get_color
 

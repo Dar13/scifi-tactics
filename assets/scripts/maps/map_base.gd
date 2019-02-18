@@ -67,36 +67,30 @@ func _ready():
 	enemy_area.hide()
 
 func get_player_placement_positions():
-	var positions = []
 	if player_area:
-		var area = player_area.get_transformed_aabb()
-		for x in range(area.position.x, area.end.x):
-			for z in range(area.position.z, area.end.z):
-				if grid_graph.has(Vector2(x, z)):
-					var raw = grid_graph[Vector2(x,z)].position
-					raw.y += 0.5	# For the 'true' center
-					positions.append(raw)
-					#positions.append(grid_graph[Vector2(x,z)].position)
+		return _get_positions(player_area.get_transformed_aabb())
 	else:
 		# TODO: All the map instead?
-		pass
-
-	return positions
+		print("No placement area defined! Returning null set!")
+		return []
 
 func get_enemy_placement_positions():
-	var positions = []
 	if enemy_area:
-		var area = enemy_area.get_transformed_aabb()
-		for x in range(area.position.x, area.end.x):
-			for z in range(area.position.z, area.end.z):
-				if grid_graph.has(Vector2(x, z)):
-					var raw = grid_graph[Vector2(x,z)].position
-					raw.y += 0.5	# For the 'true' center
-					positions.append(raw)
-					#positions.append(grid_graph[Vector2(x,z)].position)
+		return _get_positions(enemy_area.get_transformed_aabb())
 	else:
 		# TODO: All the map instead?
-		pass
+		print("No placement defined! Returning null set!")
+		return []
+
+func _get_positions(area):
+	var positions = []
+	if area:
+		var x_range = Vector2(area.position.x, area.end.x).ceil()
+		var z_range = Vector2(area.position.z, area.end.z).ceil()
+		for x in range(x_range.x, x_range.y):
+			for z in range(z_range.x, z_range.y):
+				if grid_graph.has(Vector2(x, z)):
+					positions.append(grid_graph[Vector2(x,z)].position)
 
 	return positions
 

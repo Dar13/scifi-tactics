@@ -5,7 +5,7 @@
 [ext_resource path="res://assets/fonts/dejavu_sans_16.tres" type="DynamicFont" id=3]
 [ext_resource path="res://assets/gui/minimize.png" type="Texture" id=4]
 
-[node name="root" type="Panel" index="0"]
+[node name="root" type="Panel"]
 
 anchor_left = 0.0
 anchor_top = 0.5
@@ -70,7 +70,6 @@ _sections_unfolded = [ "Anchor", "Margin" ]
 
 [node name="meta_col" type="VBoxContainer" parent="overview/info_container" index="0"]
 
-editor/display_folded = true
 anchor_left = 0.0
 anchor_top = 0.0
 anchor_right = 0.0
@@ -84,7 +83,7 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 0
-_sections_unfolded = [ "Anchor", "Margin", "Size Flags" ]
+_sections_unfolded = [ "Anchor", "Margin" ]
 
 [node name="name" type="Label" parent="overview/info_container/meta_col" index="0"]
 

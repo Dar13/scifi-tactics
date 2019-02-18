@@ -17,7 +17,7 @@ mouse_filter = 0
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
-_sections_unfolded = [ "Rect", "Size Flags" ]
+_sections_unfolded = [ "Margin", "Size Flags" ]
 
 [node name="hbox" type="HBoxContainer" parent="." index="0"]
 

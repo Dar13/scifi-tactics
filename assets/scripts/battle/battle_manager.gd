@@ -26,6 +26,12 @@ var equipment_state = load("res://assets/scripts/equipment/equipment_state.gd")
 var ability_scene = load("res://assets/scenes/ability.tscn")
 var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
 
+var tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
+var tile_class = load("res://assets/scripts/move_tile.gd")
+var placement_scene = load("res://assets/scenes/character_placement.tscn")
+var placement_gui = null
+var placement_tiles = []
+
 var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
 var battle_win_condition = null
 
@@ -84,7 +90,10 @@ func _ready():
 	var plr_placement_pos = map.get_player_placement_positions()
 	for i in range(player_party.size()):
 		var character = character_scene.instance()
-		character.init(player_party.get(i), plr_placement_pos[i], true, character_dir.CharDirections.East)
+		var pos = plr_placement_pos[i]
+		pos.y += 0.5	# TODO: character.get_center_offset()
+		character.init(player_party.get(i), pos,
+				true, character_dir.CharDirections.East)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		character.set_on_player_team()
 		
@@ -93,12 +102,16 @@ func _ready():
 		player_team[character.get_collider().get_instance_id()] = character
 
 	# Create the enemy team from the enemy party
-	# TODO: Get positions/directions from character placement stage of battle (for enemies
-	# 	this is from the campaign scenario or the random battle information)
+	# TODO: Get positions/directions from character placement stage of battle
+	#	(for enemies this is from the campaign scenario or the random
+	#	battle information)
 	var enem_placement_pos = map.get_enemy_placement_positions()
 	for i in range(enemy_party.size()):
 		var character = character_scene.instance()
-		character.init(enemy_party.get(i), enem_placement_pos[i], true, character_dir.CharDirections.West)
+		var pos = enem_placement_pos[i]
+		pos.y += 0.5	# TODO: character.get_center_offset()
+		character.init(enemy_party.get(i), pos,
+				true, character_dir.CharDirections.West)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
 
@@ -195,7 +208,17 @@ func update_battle_phase(new_phase):
 
 func setup_character_placement():
 	print("doing character placement")
-	update_battle_phase(BattlePhase.BATTLE)
+	placement_gui = placement_scene.instance()
+	add_child(placement_gui)
+
+	placement_gui.set_characters(player_team)
+	var plr_placement_pos = map.get_player_placement_positions()
+	for i in range(plr_placement_pos.size()):
+		placement_tiles.append(tile_scene.instance())
+		var tile_pos = plr_placement_pos[i]
+		tile_pos.y += tile_class.TILE_OFFSET
+		add_child(placement_tiles[i])
+		placement_tiles[i].display(tile_pos, Color(0, 0, 1.0, 0.3))
 
 # Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
 func evaluate_battlefield():
