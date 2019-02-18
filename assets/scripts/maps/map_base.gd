@@ -73,7 +73,10 @@ func get_player_placement_positions():
 		for x in range(area.position.x, area.end.x):
 			for z in range(area.position.z, area.end.z):
 				if grid_graph.has(Vector2(x, z)):
-					positions.append(grid_graph[Vector2(x,z)].position)
+					var raw = grid_graph[Vector2(x,z)].position
+					raw.y += 0.5	# For the 'true' center
+					positions.append(raw)
+					#positions.append(grid_graph[Vector2(x,z)].position)
 	else:
 		# TODO: All the map instead?
 		pass
@@ -87,7 +90,10 @@ func get_enemy_placement_positions():
 		for x in range(area.position.x, area.end.x):
 			for z in range(area.position.z, area.end.z):
 				if grid_graph.has(Vector2(x, z)):
-					positions.append(grid_graph[Vector2(x,z)].position)
+					var raw = grid_graph[Vector2(x,z)].position
+					raw.y += 0.5	# For the 'true' center
+					positions.append(raw)
+					#positions.append(grid_graph[Vector2(x,z)].position)
 	else:
 		# TODO: All the map instead?
 		pass

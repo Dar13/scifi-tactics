@@ -1,6 +1,13 @@
 extends Node
 
-# class member variables go here, for example:
+enum BattlePhase {
+	INIT = 0,
+	CHARACTER_PLACEMENT,
+	PRE_BATTLE,
+	BATTLE,
+	POST_BATTLE,
+}
+
 onready var camera = get_viewport().get_camera()
 var map = null
 
@@ -31,6 +38,8 @@ var player_team = {}
 var enemy_team = {}
 
 onready var num_turns = 0
+
+onready var phase = BattlePhase.INIT
 
 onready var fps_label = get_node("../fps_label")
 
@@ -71,11 +80,11 @@ func _ready():
 		enemy_party.add_character(state)
 
 	# Create the player team from the player party
-	# TODO: Get positions/directions from character placement stage of battle
-	var test_positions = [Vector3(0, 0.5, 3), Vector3(2, 0.5, 4), Vector3(-2, 0.5, 3)]
+	# Character default positions from the possible player placement positions
+	var plr_placement_pos = map.get_player_placement_positions()
 	for i in range(player_party.size()):
 		var character = character_scene.instance()
-		character.init(player_party.get(i), test_positions[i], true, character_dir.CharDirections.East)
+		character.init(player_party.get(i), plr_placement_pos[i], true, character_dir.CharDirections.East)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		character.set_on_player_team()
 		
@@ -86,10 +95,10 @@ func _ready():
 	# Create the enemy team from the enemy party
 	# TODO: Get positions/directions from character placement stage of battle (for enemies
 	# 	this is from the campaign scenario or the random battle information)
-	test_positions = [Vector3(-2, 0.5, -4), Vector3(0, 0.5, -4), Vector3(2, 0.5, -4)]
+	var enem_placement_pos = map.get_enemy_placement_positions()
 	for i in range(enemy_party.size()):
 		var character = character_scene.instance()
-		character.init(enemy_party.get(i), test_positions[i], true, character_dir.CharDirections.West)
+		character.init(enemy_party.get(i), enem_placement_pos[i], true, character_dir.CharDirections.West)
 		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
 
@@ -131,9 +140,12 @@ func _ready():
 
 	# TODO: Get this information from the Map Scene or a campaign file or something
 	# Set up the win condition for the battle
-	battle_win_condition = win_condition_class.new(win_condition_class.WinConditions.KILL_LEADER, enemy_team.values()[0], win_condition_class.LossConditions.LEADER_DEAD, player_team.values()[0])
+	battle_win_condition = win_condition_class.new(win_condition_class.WinConditions.KILL_LEADER,
+			enemy_team.values()[0], win_condition_class.LossConditions.LEADER_DEAD, player_team.values()[0])
 
-	start_next_turn()
+	update_battle_phase(BattlePhase.PRE_BATTLE)	# pre-battle is a no-op atm
+
+	#start_next_turn()
 	return
 
 # Assuming this is called after my children's are called...
@@ -154,6 +166,36 @@ func _exit_tree():
 		enemy_party.free()
 	
 	battle_win_condition.free()
+
+func update_battle_phase(new_phase):
+	phase = new_phase
+
+	# Reset phase-specific state here
+
+	match new_phase:
+		BattlePhase.INIT:
+			print("WTF are you doing back here...")
+
+		# Do character placement
+		BattlePhase.PRE_BATTLE:
+			setup_character_placement()
+			pass
+
+		# TODO: Evaluate results of character placement into teams
+		BattlePhase.BATTLE:
+			start_next_turn()
+
+		# Do post-battle stuff like battle rewards, etc.
+		BattlePhase.POST_BATTLE:
+			print("Battle over, do stuff here...")
+			pass
+
+		_:
+			print("Really, how did you get here?")
+
+func setup_character_placement():
+	print("doing character placement")
+	update_battle_phase(BattlePhase.BATTLE)
 
 # Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
 func evaluate_battlefield():
@@ -176,10 +218,12 @@ func start_next_turn():
 	if battle_win_condition.evaluate_win(enemy_team, num_turns):
 		# TODO: Make this do things...
 		print("Won the battle!")
+		update_battle_phase(BattlePhase.POST_BATTLE)
 
 	if battle_win_condition.evaluate_loss(player_team, num_turns):
 		# TODO: Make this do things...
 		print("Lost the battle!")
+		update_battle_phase(BattlePhase.POST_BATTLE)
 
 	num_turns += 1
 
