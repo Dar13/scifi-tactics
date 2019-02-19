@@ -11,7 +11,7 @@ enum BattlePhase {
 onready var camera = get_viewport().get_camera()
 var map = null
 
-onready var character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
+onready var character_mgr = null
 var character_scene = load("res://assets/scenes/character.tscn")
 var character_state = load("res://assets/scripts/characters/character_state.gd")
 var character_class = load("res://assets/scripts/characters/character.gd")
@@ -55,17 +55,6 @@ func _ready():
 	map.name = "map"	# We don't care what the scene we instanced calls itself
 	add_child(map)
 
-	# TODO: Use this for the "character placement" phase
-	#print("Player placement zone:")
-	#print(map.get_player_placement_positions())
-	#print("---")
-	#print("Enemy placement zone:")
-	#print(map.get_enemy_placement_positions())
-
-	add_child(character_mgr)
-	character_mgr.connect("battlefield_updated", self, "evaluate_battlefield")
-	character_mgr.connect("turn_done", self, "finish_turn")
-	
 	# Initialize the battle scene
 	# For now this means, create a player and enemy party and set them in some
 	# default way.
@@ -94,7 +83,6 @@ func _ready():
 		pos.y += 0.5	# TODO: character.get_center_offset()
 		character.init(player_party.get(i), pos,
 				true, character_dir.CharDirections.East)
-		character.connect("update_phase", character_mgr, "update_character_phase")
 		character.set_on_player_team()
 		
 		add_child(character)
@@ -112,20 +100,9 @@ func _ready():
 		pos.y += 0.5	# TODO: character.get_center_offset()
 		character.init(enemy_party.get(i), pos,
 				true, character_dir.CharDirections.West)
-		character.connect("update_phase", character_mgr, "update_character_phase")
 		add_child(character)
 
 		enemy_team[character.get_collider().get_instance_id()] = character
-
-	# Join the two teams together to pass to the character manager
-	var battle_characters = {}
-	for plr_key in player_team.keys():
-		battle_characters[plr_key] = player_team[plr_key]
-
-	for enem_key in enemy_team.keys():
-		battle_characters[enem_key] = enemy_team[enem_key]
-
-	character_mgr.prepare_for_battle(battle_characters)
 
 	# Pick first player character for a weapon's test
 	var test_wep = weapon_scene.instance()
@@ -156,9 +133,8 @@ func _ready():
 	battle_win_condition = win_condition_class.new(win_condition_class.WinConditions.KILL_LEADER,
 			enemy_team.values()[0], win_condition_class.LossConditions.LEADER_DEAD, player_team.values()[0])
 
-	update_battle_phase(BattlePhase.PRE_BATTLE)	# pre-battle is a no-op atm
+	update_battle_phase(BattlePhase.CHARACTER_PLACEMENT)
 
-	#start_next_turn()
 	return
 
 # Assuming this is called after my children's are called...
@@ -190,11 +166,16 @@ func update_battle_phase(new_phase):
 			print("WTF are you doing back here...")
 
 		# Do character placement
-		BattlePhase.PRE_BATTLE:
+		BattlePhase.CHARACTER_PLACEMENT:
 			setup_character_placement()
+			#update_battle_phase(BattlePhase.PRE_BATTLE)
 			pass
 
 		# TODO: Evaluate results of character placement into teams
+		BattlePhase.PRE_BATTLE:
+			pre_battle_setup()
+			update_battle_phase(BattlePhase.BATTLE)
+
 		BattlePhase.BATTLE:
 			start_next_turn()
 
@@ -219,6 +200,24 @@ func setup_character_placement():
 		tile_pos.y += tile_class.TILE_OFFSET
 		add_child(placement_tiles[i])
 		placement_tiles[i].display(tile_pos, Color(0, 0, 1.0, 0.3))
+
+func pre_battle_setup():
+	character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
+	character_mgr.connect("battlefield_updated", self, "evaluate_battlefield")
+	character_mgr.connect("turn_done", self, "finish_turn")
+	add_child(character_mgr)
+
+	# Join the two teams together to pass to the character manager and set up signals
+	var battle_characters = {}
+	for plr_key in player_team.keys():
+		battle_characters[plr_key] = player_team[plr_key]
+		player_team[plr_key].connect("update_phase", character_mgr, "update_character_phase")
+
+	for enem_key in enemy_team.keys():
+		battle_characters[enem_key] = enemy_team[enem_key]
+		enemy_team[enem_key].connect("update_phase", character_mgr, "update_character_phase")
+
+	character_mgr.prepare_for_battle(battle_characters)
 
 # Update and evaluate various pieces of information relevant to pathfinding, gameplay, etc.
 func evaluate_battlefield():
