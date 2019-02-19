@@ -119,6 +119,9 @@ func set_position(pos):
 	set_identity()
 	translate(pos)
 
+func get_position():
+	return self.translation
+
 func set_direction(direction):
 	facing = direction
 	instance.set_direction(direction)

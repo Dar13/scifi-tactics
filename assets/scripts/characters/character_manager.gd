@@ -33,8 +33,6 @@ var selected_char_ability = null
 var attack_target = []
 var attack_context = null
 
-const TILE_OFFSET = 0.65
-
 onready var selected_char_attack_confirm = attack_confirm_menu.instance()
 onready var selected_char_attack_preview = attack_preview_menu.instance()
 onready var char_dir_arrows = character_direction_arrows.instance()
@@ -222,7 +220,7 @@ func handle_click(object):
 			var tile_idx = character_move_tiles.find(parent)
 			if tile_idx > -1:
 				var tile_world_pos = character_move_tiles[tile_idx].translation
-				tile_world_pos.y = floor(tile_world_pos.y - TILE_OFFSET + 0.1) # weird floating-point thing, this turns into -0.0f without the add of 0.1
+				tile_world_pos.y = floor(tile_world_pos.y - move_tile.TILE_OFFSET + 0.1) # weird floating-point thing, this turns into -0.0f without the add of 0.1
 				var tile_map_pos = map.get_map_coords(tile_world_pos)
 				# Only process movement if the selected character is on the current team
 				if selected_character && current_team.values().has(selected_character):

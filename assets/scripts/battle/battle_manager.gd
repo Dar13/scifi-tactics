@@ -28,6 +28,9 @@ var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
 
 var tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
 var tile_class = load("res://assets/scripts/move_tile.gd")
+
+var placement_mgr_class = load("res://assets/scripts/battle/character_placement.gd")
+var placement_mgr = null
 var placement_scene = load("res://assets/scenes/character_placement.tscn")
 var placement_gui = null
 var placement_tiles = []
@@ -188,7 +191,10 @@ func update_battle_phase(new_phase):
 			print("Really, how did you get here?")
 
 func setup_character_placement():
-	print("doing character placement")
+	placement_mgr = placement_mgr_class.new()
+	add_child(placement_mgr)
+	placement_mgr.set_party(player_team)
+
 	placement_gui = placement_scene.instance()
 	add_child(placement_gui)
 
