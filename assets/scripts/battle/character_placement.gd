@@ -3,6 +3,9 @@ extends Node
 var tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
 var tile_class = load("res://assets/scripts/move_tile.gd")
 
+var ui_scene = load("res://assets/scenes/character_placement.tscn")
+var ui = null
+
 onready var party = null
 onready var mouse_pos = Vector2(0, 0)
 onready var perform_click_raycast = false
@@ -17,6 +20,10 @@ var tiles = []
 var tile_map_pos = []
 
 func _ready():
+	ui = ui_scene.instance()
+	add_child(ui)
+	ui.connect("selected", self, "ui_selected")
+
 	var plr_placement_pos = map.get_player_placement_positions()
 	for i in range(plr_placement_pos.size()):
 		var tile_pos = plr_placement_pos[i]
@@ -25,7 +32,6 @@ func _ready():
 		tile_pos.y += tile_class.TILE_OFFSET
 		add_child(tiles[i])
 		tiles[i].display(tile_pos, Color(0, 0, 1.0, 0.3))
-	pass
 
 func _physics_process(delta):
 	var cast_origin = camera.project_ray_origin(mouse_pos)
@@ -60,6 +66,7 @@ func _unhandled_input(event):
 
 func set_party(p):
 	party = p
+	ui.set_characters(party)
 
 func handle_click(collider):
 	var parent = collider.get_parent()
@@ -104,3 +111,6 @@ func reset_selected(new):
 	selected_character_original_pos = new.get_position()
 	selected_character.select()
 	change_char_collision(0, false)
+
+func ui_selected(character):
+	reset_selected(character)

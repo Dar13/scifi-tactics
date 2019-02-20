@@ -28,8 +28,6 @@ var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
 
 var placement_mgr_class = load("res://assets/scripts/battle/character_placement.gd")
 var placement_mgr = null
-var placement_scene = load("res://assets/scenes/character_placement.tscn")
-var placement_gui = null
 
 var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
 var battle_win_condition = null
@@ -167,8 +165,6 @@ func update_battle_phase(new_phase):
 		# Do character placement
 		BattlePhase.CHARACTER_PLACEMENT:
 			setup_character_placement()
-			#update_battle_phase(BattlePhase.PRE_BATTLE)
-			pass
 
 		# TODO: Evaluate results of character placement into teams
 		BattlePhase.PRE_BATTLE:
@@ -190,11 +186,6 @@ func setup_character_placement():
 	placement_mgr = placement_mgr_class.new()
 	add_child(placement_mgr)
 	placement_mgr.set_party(player_team)
-
-	placement_gui = placement_scene.instance()
-	add_child(placement_gui)
-
-	placement_gui.set_characters(player_team)
 
 func pre_battle_setup():
 	character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
