@@ -26,14 +26,10 @@ var equipment_state = load("res://assets/scripts/equipment/equipment_state.gd")
 var ability_scene = load("res://assets/scenes/ability.tscn")
 var ability_state = load("res://assets/scripts/equipment/ability_state.gd")
 
-var tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
-var tile_class = load("res://assets/scripts/move_tile.gd")
-
 var placement_mgr_class = load("res://assets/scripts/battle/character_placement.gd")
 var placement_mgr = null
 var placement_scene = load("res://assets/scenes/character_placement.tscn")
 var placement_gui = null
-var placement_tiles = []
 
 var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
 var battle_win_condition = null
@@ -199,13 +195,6 @@ func setup_character_placement():
 	add_child(placement_gui)
 
 	placement_gui.set_characters(player_team)
-	var plr_placement_pos = map.get_player_placement_positions()
-	for i in range(plr_placement_pos.size()):
-		placement_tiles.append(tile_scene.instance())
-		var tile_pos = plr_placement_pos[i]
-		tile_pos.y += tile_class.TILE_OFFSET
-		add_child(placement_tiles[i])
-		placement_tiles[i].display(tile_pos, Color(0, 0, 1.0, 0.3))
 
 func pre_battle_setup():
 	character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()
