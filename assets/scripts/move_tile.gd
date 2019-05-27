@@ -42,7 +42,7 @@ func set_color(new_value):
 	
 	pass
 
-func get_color(new_value):
+func get_color():
 	var rv = Color(0, 0, 0, 1.0)
 	if material is SpatialMaterial:
 		rv = material.albedo_color

@@ -8,7 +8,7 @@ enum AttackType {
 	Invalid		= 0x0,
 	Physical 	= 0x1,	# The default type
 	Tech		= 0x2,	# Technology-based
-	Hybrid		= (Physical | Tech),
+	Hybrid		= (0x1 | 0x2),
 	Explosion	= 0x4,
 	Freezing	= 0x8,
 }

@@ -18,13 +18,13 @@ func _ready():
 
 func start_new():
 	global_state.next_scene = new_game_scene
-	get_tree().change_scene("res://assets/scenes/loading.tscn")
+	Utils.handle_error(self, get_tree().change_scene("res://assets/scenes/loading.tscn"), true)
 
 func load_game():
-	get_tree().change_scene(continue_game_scene)
+	Utils.handle_error(self, get_tree().change_scene(continue_game_scene), true)
 
 func go_to_options():
-	get_tree().change_scene(options_scene)
+	Utils.handle_error(self, get_tree().change_scene(options_scene), true)
 
 func exit_game():
 	propagate_notification(MainLoop.NOTIFICATION_WM_QUIT_REQUEST)

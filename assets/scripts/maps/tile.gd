@@ -64,7 +64,7 @@ func _init(t):
 
 	# Set characteristics based on type
 	match type:
-		None:
+		TileTypes.None:
 			pass
 		TileTypes.GroundDirt:
 			pass
