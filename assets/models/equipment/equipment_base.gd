@@ -12,8 +12,7 @@ func _init():
 	state = state_class.new()
 
 func setup_thumbnail(thumb_path):
-	thumbnail = ImageTexture.new()
-	thumbnail.load(thumb_path)
+	thumbnail = load(thumb_path)
 
 func destroy():
 	if state:

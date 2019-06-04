@@ -40,7 +40,7 @@ func _physics_process(delta):
 			fade.color = fade_trans.linear_interpolate(fade_solid, fade_elapsed / fade_duration)
 			fade_elapsed += delta
 		3:
-			get_tree().change_scene_to(loader.get_resource())
+			Utils.handle_error(self, get_tree().change_scene_to(loader.get_resource()))
 
 	if fade_elapsed > fade_duration:
 		loading += 1
