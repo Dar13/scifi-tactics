@@ -59,7 +59,7 @@ func _physics_process(delta):
 func _unhandled_input(event):
 	if event.is_action("left_click") && event.pressed == false:
 		perform_click_raycast = true
-		change_char_collision(0, true)
+		make_chars_pickable()
 
 	if event is InputEventMouse:
 		mouse_pos = event.global_position
@@ -91,10 +91,17 @@ func set_selected_position(tile):
 	selected_pos.y += 0.5 # TODO: selected_character.get_center_offset().y
 	if selected_character:
 		selected_character.set_position(selected_pos)
+		selected_character.show()
 
-func change_char_collision(layer, val):
+func make_chars_pickable():
 	for c in party.values():
-		c.get_collider().set_collision_layer_bit(layer, val)
+		if c.visible:
+			c.get_collider().set_collision_layer_bit(0, true)
+
+func make_chars_unpickable():
+	for c in party.values():
+		if c.visible:
+			c.get_collider().set_collision_layer_bit(0, false)
 
 func clear_selected():
 	if selected_character:
@@ -110,7 +117,7 @@ func reset_selected(new):
 	selected_character = new
 	selected_character_original_pos = new.get_position()
 	selected_character.select()
-	change_char_collision(0, false)
+	make_chars_unpickable()
 
 func ui_selected(character):
 	reset_selected(character)

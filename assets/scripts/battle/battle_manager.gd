@@ -79,7 +79,7 @@ func _ready():
 		var pos = plr_placement_pos[i]
 		pos.y += 0.5	# TODO: character.get_center_offset()
 		character.init(player_party.get(i), pos,
-				true, character_dir.CharDirections.East)
+				false, character_dir.CharDirections.East)
 		character.set_on_player_team()
 		
 		add_child(character)

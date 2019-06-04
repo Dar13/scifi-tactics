@@ -82,9 +82,11 @@ func init(char_state, initial_position, initial_show, direction):
 	set_position(initial_position)
 
 	if initial_show:
-		instance.show()
+		show()
 	else:
-		instance.hide()
+		hide()
+		# Assume that since we're hidden, turn off collisions on layer 0
+		get_collider().set_collision_layer_bit(0, false)
 
 	add_child(instance)
 	set_direction(direction)
