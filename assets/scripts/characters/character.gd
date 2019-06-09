@@ -111,6 +111,15 @@ func deselect(do_update):
 	if do_update:
 		emit_signal("update_phase", self, Phases.Unselected)
 
+func show_and_modify_collision(make_pickable: bool):
+	get_collider().set_collision_layer_bit(0, make_pickable)
+	show()
+
+func hide_and_modify_collision(make_pickable: bool):
+	get_collider().set_collision_layer_bit(0, make_pickable)
+	hide()
+
+
 func get_collider():
 	return instance
 

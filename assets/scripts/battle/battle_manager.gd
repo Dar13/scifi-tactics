@@ -186,6 +186,16 @@ func setup_character_placement():
 	placement_mgr = placement_mgr_class.new()
 	add_child(placement_mgr)
 	placement_mgr.set_party(player_team)
+	placement_mgr.connect("finished", self, "placement_done_handler")
+
+func placement_done_handler():
+	print("placement phase done! Moving to BATTLE")
+	cleanup_character_placement()
+	update_battle_phase(BattlePhase.PRE_BATTLE)
+
+func cleanup_character_placement():
+	remove_child(placement_mgr)
+	placement_mgr.queue_free()
 
 func pre_battle_setup():
 	character_mgr = load("res://assets/scripts/characters/character_manager.gd").new()

@@ -463,7 +463,7 @@ func display_char_attack_tiles(attack_space_locations):
 		if space == null: continue
 		
 		var real_pos = map.get_world_coords(space)
-		real_pos.y += TILE_OFFSET
+		real_pos.y += move_tile.TILE_OFFSET
 		
 		character_move_tiles[idx].display(real_pos, Color(1.0, 0.0, 0.0, 0.3))
 		idx += 1
@@ -482,7 +482,7 @@ func display_char_move_tiles(ch, distance):
 	var idx = 0
 	for tile in move_tiles:
 		var tile_world_pos = map.get_world_coords(tile.map_position)
-		tile_world_pos.y += TILE_OFFSET
+		tile_world_pos.y += move_tile.TILE_OFFSET
 
 		character_move_tiles[idx].display(tile_world_pos, Color(0, 0, 1.0, 0.3))
 		idx += 1

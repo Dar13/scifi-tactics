@@ -9,12 +9,18 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Node",
+"class": "AttackContext",
+"language": "GDScript",
+"path": "res://assets/scripts/battle/attack_context.gd"
+}, {
 "base": "Reference",
 "class": "Utils",
 "language": "GDScript",
 "path": "res://assets/scripts/utils/utils.gd"
 } ]
 _global_script_class_icons={
+"AttackContext": "",
 "Utils": ""
 }
 

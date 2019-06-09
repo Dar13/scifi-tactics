@@ -1,3 +1,5 @@
+class_name AttackContext
+
 extends Node
 
 # Data about a particular attack
@@ -9,7 +11,7 @@ var defender = null
 var defender_info = {}
 
 static func generate_context(atk_char, def_char, selected_instrument):
-	var ctx = new()
+	var ctx = load("res://assets/scripts/battle/attack_context.gd").new()
 
 	var atk = atk_char.state.generate_attack(selected_instrument)
 	def_char.state.evaluate_attack(atk)

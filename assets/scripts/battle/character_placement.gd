@@ -1,5 +1,9 @@
 extends Node
 
+signal placed(character)
+signal placing(character)
+signal finished()
+
 var tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
 var tile_class = load("res://assets/scripts/move_tile.gd")
 
@@ -23,6 +27,10 @@ func _ready():
 	ui = ui_scene.instance()
 	add_child(ui)
 	ui.connect("selected", self, "ui_selected")
+	ui.connect("finished", self, "ui_finished")
+
+	connect("placed", ui, "character_placed")
+	connect("placing", ui, "character_pickedup")
 
 	var plr_placement_pos = map.get_player_placement_positions()
 	for i in range(plr_placement_pos.size()):
@@ -72,9 +80,15 @@ func handle_click(collider):
 	var parent = collider.get_parent()
 	if party.has(collider.get_instance_id()):
 		reset_selected(parent)
+		emit_signal("placing", selected_character)
+		return
 
 	if is_valid_tile(parent):
 		set_selected_position(parent)
+		emit_signal("placed", selected_character)
+		clear_selected()
+	else:
+		selected_character.hide_and_modify_collision(false)
 		clear_selected()
 
 func is_valid_tile(obj):
@@ -121,3 +135,6 @@ func reset_selected(new):
 
 func ui_selected(character):
 	reset_selected(character)
+
+func ui_finished():
+	emit_signal("finished")

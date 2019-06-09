@@ -1,4 +1,4 @@
-extends Node
+extends HBoxContainer
 
 func _ready():
 	pass
