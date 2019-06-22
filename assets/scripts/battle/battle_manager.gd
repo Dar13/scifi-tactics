@@ -194,6 +194,16 @@ func placement_done_handler():
 	update_battle_phase(BattlePhase.PRE_BATTLE)
 
 func cleanup_character_placement():
+	# Only placed members stay on the player team
+	var placed = placement_mgr.get_placed()
+	var to_remove = []
+	for key in player_team.keys():
+		if placed.has(player_team[key]) == false:
+			to_remove.append(key)
+
+	for k in to_remove:
+		player_team.erase(k)
+
 	remove_child(placement_mgr)
 	placement_mgr.queue_free()
 

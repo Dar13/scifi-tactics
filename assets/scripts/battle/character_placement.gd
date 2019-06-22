@@ -20,6 +20,8 @@ onready var map = get_node("../map")
 onready var selected_character = null
 onready var selected_character_original_pos = Vector3(0, 0, 0)
 
+onready var placed_characters = []
+
 var tiles = []
 var tile_map_pos = []
 
@@ -30,7 +32,10 @@ func _ready():
 	ui.connect("finished", self, "ui_finished")
 
 	connect("placed", ui, "character_placed")
+	connect("placed", self, "track_placed")
+
 	connect("placing", ui, "character_pickedup")
+	connect("placing", self, "track_placing")
 
 	var plr_placement_pos = map.get_player_placement_positions()
 	for i in range(plr_placement_pos.size()):
@@ -75,6 +80,15 @@ func _unhandled_input(event):
 func set_party(p):
 	party = p
 	ui.set_characters(party)
+
+func track_placed(c):
+	placed_characters.append(c)
+
+func track_placing(c):
+	placed_characters.erase(c)
+
+func get_placed():
+	return placed_characters
 
 func handle_click(collider):
 	var parent = collider.get_parent()
@@ -137,4 +151,5 @@ func ui_selected(character):
 	reset_selected(character)
 
 func ui_finished():
+	print(placed_characters)
 	emit_signal("finished")
