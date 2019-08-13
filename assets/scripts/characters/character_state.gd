@@ -26,6 +26,8 @@ enum JumpType {
 var character_class = Classes.BASIC
 var character_class_str = "Basic"
 
+var character_name = "<default-name>"
+
 # Progression attributes
 var level = 0
 var experience = 0		# Level up occurs at experience == 100
@@ -79,7 +81,7 @@ func destroy():
 
 # This only initializes specific internal variables and class-dependent attributes.
 # All other attributes should be initialized elsewhere.
-func init(char_class):
+func init(char_class, save_data := {}):
 	character_class = char_class
 
 	match character_class:
@@ -96,6 +98,9 @@ func init(char_class):
 			base_tech_attack = 0
 		_:
 			character_class_str = "<Unknown>"
+
+	if !save_data.empty():
+		set_from_save_data(save_data)
 
 # Ensure all attributes are the correct values as if the character was going into battle
 func prepare():
@@ -282,3 +287,57 @@ func evaluate_attack(attack):
 	if attack.tech_attack_magnitude > 0:
 		attack.tech_attack_magnitude -= stats[3]
 		attack.tech_attack_magnitude = clamp(attack.tech_attack_magnitude, 1, 1000)
+
+var persistent_stats = [
+	"class",
+	"name",
+	"level",
+	"experience",
+	"health",
+	"max_health",
+	"energy",
+	"max_energy",
+	"energy_gain",
+	"start_energy",
+	"power",
+	"skill",
+	"expertise"
+]
+
+func get_save_data():
+	# Generate a dictionary about important stats and such
+	var data = {
+		"class" : self.character_class,
+		"name" : self.character_name,
+		"level" : self.level,
+		"experience" : self.experience,
+		"health" : self.health,
+		"max_health" : self.max_health,
+		"energy" : self.energy,
+		"max_energy" : self.max_energy,
+		"energy_gain" : self.energy_gain,
+		"start_energy" : self.start_energy,
+		"power" : self.power,
+		"skill" : self.skill,
+		"expertise" : self.expertise,
+	}
+
+	if global_state.debug_mode == 1:
+		if data.has_all(persistent_stats) == false:
+			Utils.handle_error(self, "Save format for character doesn't match persistent stats array!", true)
+
+	#print(data)
+
+	return data
+
+func set_from_save_data(data: Dictionary) -> bool:
+	# The inverse of 'get_save_data'
+	if data.has_all(persistent_stats) == false:
+		if global_state.debug_mode == 1:
+			Utils.handle_error(self, "Save format for character doesn't match persistent stats array!", true)
+
+		return false
+
+	#print(data)
+
+	return true

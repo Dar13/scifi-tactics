@@ -30,5 +30,13 @@ func get(i):
 func initialize_from(something):
 	print("TODO: Initialize the party from something...")
 
-func suspend_to(something):
-	print("TODO: Save party to something...")
+func suspend_to(file):
+	# TODO: Iterate over the characters array, and make
+	# 	a 'character.get_save_data()' that will generate a
+	#	dictionary of character state variables.
+	#	Bleh.
+	# TODO: Caller passes in active file object (party.dat)
+	for c in characters:
+		var d = c.get_save_data()
+		var j = to_json(d)
+		# TODO: Write 'j' to 'file' via file.store_line(j)

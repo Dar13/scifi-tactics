@@ -37,6 +37,9 @@ static func handle_error(obj: Node, error, do_stack_dump: bool = false):
 	# 2. An object of some sort:
 	elif (error == null):
 		err_dlg = global_state.error_popup.new("Null object!", stack)
+	# 3. A string:
+	elif (error is String):
+		err_dlg = global_state.error_popup.new(error, stack)
 
 	if err_dlg != null:
 		obj.add_child(err_dlg)
