@@ -113,6 +113,7 @@ func prepare():
 #	- Total physical defense magnitude
 #	- Total tech defense magnitude
 #	- Attack Type
+#	- Range of attacks made with active weapon
 #	- TODO: Resistances
 func evaluate_equipment():
 	var phys_atk_contrib = base_phys_attack
@@ -126,6 +127,7 @@ func evaluate_equipment():
 	var tech_def = disruption
 
 	var type = attack_class.AttackType.Invalid
+	var atk_range = 0
 
 	# Determine:
 	#	* active weapon (if null)
@@ -143,6 +145,7 @@ func evaluate_equipment():
 	if active_weapon:
 		phys_atk_contrib = active_weapon.get_state().atk_power(self)[0]
 		tech_atk_contrib = active_weapon.get_state().atk_power(self)[1]
+		atk_range = active_weapon.get_state().attack_range
 
 	if phys_atk_contrib > 0:
 		phys_atk += phys_atk_contrib
@@ -156,7 +159,7 @@ func evaluate_equipment():
 	else:
 		tech_atk = 0
 
-	return [phys_atk, tech_atk, phys_def, tech_def, type]
+	return [phys_atk, tech_atk, phys_def, tech_def, type, atk_range]
 
 # Called after every turn, used for temporary effects (ENG increment, turn-based increases to PWR/SKL/EPT/etc)
 func evaluate_turn_end():
@@ -238,7 +241,7 @@ func generate_attack(instrument):
 		print("generate_attack: Non-weapon/non-ability provided = %s" % instrument)
 
 	var stats = evaluate_equipment()
-	var atk = attack_class.new(stats[4], stats[0], stats[1], 1.0)
+	var atk = attack_class.new(stats[4], stats[0], stats[1], 1.0, stats[5])
 	return atk
 
 # Returns a triplet: [physical hit rate, tech hit rate, hybrid hit rate]

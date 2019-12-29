@@ -140,6 +140,12 @@ func set_direction(direction):
 func set_movement_space(cells):
 	movement_cells = cells
 
+func get_dist_to_char(character):
+	if character is Spatial:
+		return self.get_position().distance_to(character.get_position())
+	else:
+		return INF
+
 func move(tgt_map_coord):
 	for cell in movement_cells:
 		if cell.map_position == tgt_map_coord:

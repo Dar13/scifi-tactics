@@ -29,10 +29,16 @@ static func generate_context(atk_char, def_char, selected_instrument):
 
 	atk.free()
 
-	# This may not be correct when using ranged combat.
-	# But for now, it'll do.
-	# TODO: This is the cause for issue #12
+	# Quick check for possibility of counter-attack
 	var counter_possible = (atk_char.facing != def_char.facing)
+
+	# Make sure the counter-attack is *actually* possible with defending character's weapon
+	if counter_possible:
+		var counter = def_char.state.generate_attack(null)
+		if atk_char.get_dist_to_char(def_char) > counter.max_range:
+			counter_possible = false
+
+		counter.free()
 
 	ctx.defender = def_char
 	ctx.defender_info = {"name": "Ellie",

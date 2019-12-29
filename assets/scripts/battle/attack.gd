@@ -14,6 +14,7 @@ enum AttackType {
 }
 
 var type = AttackType.Invalid
+var max_range = 0
 
 # TODO: Convert this and TileStatus to bitwise flags
 var causes_status = tile_type.TileStatus.Invalid
@@ -25,7 +26,7 @@ var tech_attack_magnitude = 0
 # that damage
 var status_scaling = 0.0
 
-func _init(atk_type, p_atk, t_atk, scale):
+func _init(atk_type, p_atk, t_atk, scale, atk_range):
 	phys_attack_magnitude = p_atk
 	tech_attack_magnitude = t_atk
 
@@ -34,6 +35,7 @@ func _init(atk_type, p_atk, t_atk, scale):
 
 	status_scaling = scale
 	type = atk_type
+	max_range = atk_range
 
 	match atk_type:
 		_:
