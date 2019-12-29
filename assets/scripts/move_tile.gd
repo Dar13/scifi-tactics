@@ -21,10 +21,10 @@ func _ready():
 #	# Update game logic here.
 #	pass
 
-func display(new_pos, color):
+func display(new_pos, new_color):
 	set_identity()
 	global_translate(new_pos)
-	set_color(color)
+	set_color(new_color)
 	# Enable collision layer 1
 	rigid_body.set_collision_layer_bit(0, true)
 	show()

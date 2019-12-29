@@ -5,7 +5,7 @@ signal turn_done
 
 var move_tile_scene = load("res://assets/models/characters/selection_tile/move_tile.tscn")
 var move_tile = load("res://assets/scripts/move_tile.gd")
-var character = load("res://assets/scripts/characters/character.gd")
+var character_class = load("res://assets/scripts/characters/character.gd")
 var character_dir = load("res://assets/scripts/characters/character_direction.gd")
 var character_stats = load("res://assets/scenes/gui/character_stat_panel.tscn")
 var character_action_menu = load("res://assets/scenes/character_action_gui.tscn")
@@ -57,7 +57,7 @@ func prepare_for_turn(new_characters):
 		c.deselect(true)
 
 		if c.state.health == 0:
-			c.current_phase = character.Phases.Done
+			c.current_phase = character_class.Phases.Done
 
 	camera.position.view_target = current_team.values().front().translation
 
@@ -148,7 +148,7 @@ func _physics_process(delta):
 			var collider_parent = cast_result["collider"].get_parent()
 			if collider_parent != null:
 				# Ensure the collider is a character (or part of the map??, haven't decided)
-				if collider_parent is character:
+				if collider_parent is character_class:
 					mouse_over_last = collider_parent
 
 				# Check against the character direction arrows for highlighting purposes
@@ -172,11 +172,11 @@ func _unhandled_input(event):
 func click_character(ch):
 	if selected_character:
 		match selected_character.current_phase:
-			character.Phases.Selected:
+			character_class.Phases.Selected:
 				selected_character.deselect(true)
 				select_character(ch)
 
-			character.Phases.AttackWeapon, character.Phases.AttackAbility:
+			character_class.Phases.AttackWeapon, character_class.Phases.AttackAbility:
 				var clicked_world_pos = ch.translation
 				var clicked_map_coord = map.get_map_coords(clicked_world_pos)
 
@@ -195,7 +195,7 @@ func select_character(ch):
 	char_stats_menu.set_character(ch)
 	char_stats_menu.show()
 
-	if ch.current_phase != character.Phases.Done:
+	if ch.current_phase != character_class.Phases.Done:
 		selected_character = ch
 		selected_character.select()
 		selected_char_original_direction = selected_character.facing
@@ -212,7 +212,7 @@ func handle_click(object):
 	#	d) Use item on character on selected tile
 	if object != null:
 		var parent = object.get_parent()
-		if parent is character:
+		if parent is character_class:
 			if battle_characters.has(object.get_instance_id()):
 				var clicked_character = battle_characters[object.get_instance_id()]
 				click_character(clicked_character)
@@ -225,12 +225,12 @@ func handle_click(object):
 				# Only process movement if the selected character is on the current team
 				if selected_character && current_team.values().has(selected_character):
 					match selected_character.current_phase:
-						character.Phases.Selected:
+						character_class.Phases.Selected:
 							selected_char_original_pos = selected_character.translation
 							selected_character.move(tile_map_pos)
 							tile_world_pos.y += selected_character.get_visual_bounds().size.y / 2
 							camera.center_around_point(tile_world_pos, camera.SPEED_LO)
-						character.Phases.AttackAbility, character.Phases.AttackWeapon:
+						character_class.Phases.AttackAbility, character_class.Phases.AttackWeapon:
 							update_attack(parent)
 		elif char_dir_arrows.select_arrow(parent):
 			# Nothing further needed here, response to this is handled in the signal
@@ -239,7 +239,7 @@ func handle_click(object):
 		else:
 			print("clicked was unhandled (potentially the map) Collider = %s" % parent)
 	else:
-		if selected_character and selected_character.current_phase == character.Phases.Selected:
+		if selected_character and selected_character.current_phase == character_class.Phases.Selected:
 			selected_character.deselect(false)
 			selected_character = null
 			selected_char_original_pos = null
@@ -263,32 +263,32 @@ func update_attack(tgt):
 		#print("update_attack: No selected weapon/ability!")
 		return
 
-	update_character_phase(selected_character, character.Phases.AttackConfirm)
+	update_character_phase(selected_character, character_class.Phases.AttackConfirm)
 
 func handle_cancel():
 	if selected_character:
 		match selected_character.current_phase:
-			character.Phases.Action:
+			character_class.Phases.Action:
 				restore_original()
-				update_character_phase(selected_character, character.Phases.Selected)
-			character.Phases.AttackWeapon, character.Phases.AttackAbility:
+				update_character_phase(selected_character, character_class.Phases.Selected)
+			character_class.Phases.AttackWeapon, character_class.Phases.AttackAbility:
 				hide_char_tiles()
-				update_character_phase(selected_character, character.Phases.Action)
-			character.Phases.AttackConfirm:
+				update_character_phase(selected_character, character_class.Phases.Action)
+			character_class.Phases.AttackConfirm:
 				selected_character.set_direction(selected_char_original_direction)
 				if selected_char_weapon:
-					update_character_phase(selected_character, character.Phases.AttackWeapon)
+					update_character_phase(selected_character, character_class.Phases.AttackWeapon)
 				elif selected_char_ability:
-					update_character_phase(selected_character, character.Phases.AttackAbility)
+					update_character_phase(selected_character, character_class.Phases.AttackAbility)
 				else:
 					print("handle_cancel: How did you get here without a weapon/ability selected??")
 
-			character.Phases.StandbyFacing:
+			character_class.Phases.StandbyFacing:
 				char_dir_arrows.hide()
-				update_character_phase(selected_character, character.Phases.Action)
+				update_character_phase(selected_character, character_class.Phases.Action)
 
 func handle_ability():
-	if selected_character and selected_character.current_phase == character.Phases.Action:
+	if selected_character and selected_character.current_phase == character_class.Phases.Action:
 		selected_char_abi_menu.set_abilities(selected_character.state.energy, selected_character.state.abilities)
 		selected_char_menu.hide()
 		selected_char_abi_menu.show()
@@ -298,11 +298,11 @@ func handle_ability():
 func handle_attack():
 	if selected_character:
 		match selected_character.current_phase:
-			character.Phases.Action:
+			character_class.Phases.Action:
 				selected_char_wep_menu.set_weapons(selected_character.state.inventory)
 				selected_char_menu.hide()
 				selected_char_wep_menu.visible = true
-			character.Phases.AttackConfirm:
+			character_class.Phases.AttackConfirm:
 				attack_context.evaluate_hit_chance()
 
 				# TODO: Another location to properly handle multiple attack targets (and the apply_attack below)
@@ -321,21 +321,21 @@ func handle_attack():
 				attack_context.free()
 				attack_context = null
 
-				update_character_phase(selected_character, character.Phases.Done)
+				update_character_phase(selected_character, character_class.Phases.Done)
 
 func handle_selected_ability():
 	if selected_char_abi_menu.selected_ability == null:
-		update_character_phase(selected_character, character.Phases.Action)
+		update_character_phase(selected_character, character_class.Phases.Action)
 	else:
 		selected_char_ability = selected_char_abi_menu.selected_ability
-		update_character_phase(selected_character, character.Phases.AttackAbility)
+		update_character_phase(selected_character, character_class.Phases.AttackAbility)
 
 func handle_selected_weapon():
 	if selected_char_wep_menu.selected_weapon == null:
-		update_character_phase(selected_character, character.Phases.Action)
+		update_character_phase(selected_character, character_class.Phases.Action)
 	else:
 		selected_char_weapon = selected_char_wep_menu.selected_weapon
-		update_character_phase(selected_character, character.Phases.AttackWeapon)
+		update_character_phase(selected_character, character_class.Phases.AttackWeapon)
 
 func restore_original():
 	if selected_character && selected_char_original_pos:
@@ -347,11 +347,11 @@ func restore_original():
 func handle_standby_confirmed():
 	char_dir_arrows.hide()
 	selected_character.set_direction(char_dir_arrows.selected_direction)
-	update_character_phase(selected_character, character.Phases.Done)
+	update_character_phase(selected_character, character_class.Phases.Done)
 
 func handle_standby():
 	if selected_character:
-		update_character_phase(selected_character, character.Phases.StandbyFacing)
+		update_character_phase(selected_character, character_class.Phases.StandbyFacing)
 
 func update_character_phase(character, new_state):
 	if character == null:
@@ -454,10 +454,6 @@ func prepare_for_target_selection(attack_space):
 
 
 func display_char_attack_tiles(attack_space_locations):
-	if character == null:
-		print("Display attack tiles: null character!")
-		return
-
 	var idx = 0
 	for space in attack_space_locations:
 		if space == null: continue
@@ -469,7 +465,7 @@ func display_char_attack_tiles(attack_space_locations):
 		idx += 1
 
 func display_char_move_tiles(ch, distance):
-	if ch == null || (ch is character) == false:
+	if ch == null || (ch is character_class) == false:
 		return
 
 	# Calculate the map coordinate the character is at
