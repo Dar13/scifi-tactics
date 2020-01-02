@@ -48,8 +48,7 @@ func set_characters(chars):
 	characters = chars
 	for c in chars.values():
 		var new_c = detail.instance()
-		# TODO: "%s Lvl %d" % [c.state.name, c.state.level]
-		var char_name = "Darius <TEMP> Lvl %d" % c.state.level
+		var char_name = "%s Lvl %d" % [c.state.character_name, c.state.level]
 		new_c.get_node("layout/name").text = char_name
 		new_c.connect("pressed", self, "detail_picked", [c])
 		layout.add_child(new_c)

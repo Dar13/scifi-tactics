@@ -19,7 +19,7 @@ func do_expand():
 	emit_signal("expand")
 
 func fill(c):
-	char_name.text = "Darius <TEMP>"
+	char_name.text = c.state.character_name
 	level.text = "Level %s" % c.state.level
 	experience.text = "Experience %s" % c.state.experience
 	health_bar.max_value = c.state.max_health

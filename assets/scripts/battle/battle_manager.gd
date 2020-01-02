@@ -32,6 +32,9 @@ var placement_mgr = null
 var win_condition_class = load("res://assets/scripts/battle/win_condition.gd")
 var battle_win_condition = null
 
+var pause_menu_scene = load("res://assets/scenes/gui/pause_menu.tscn")
+var pause_menu = null
+
 var party_class = load("res://assets/scripts/campaign/party.gd")
 var player_party = null
 var enemy_party = null
@@ -45,29 +48,59 @@ onready var num_turns = 0
 onready var phase = BattlePhase.INIT
 
 onready var fps_label = get_node("../fps_label")
+onready var pause_btn = get_node("../pause_button")
 
 func _ready():
 	# Load the battle's map, according to the 'Map' scene, and add it to the scene
 	map = load(global_state.battle_map).instance()
 	map.name = "map"	# We don't care what the scene we instanced calls itself
 	add_child(map)
+	
+	# Create the pause menu scene
+	pause_menu = pause_menu_scene.instance()
+	pause_menu.hide()
+	add_child(pause_menu)
+	
+	pause_btn.connect("pressed", self, "do_pause")
+	pause_menu.get_node("options_container/resume_btn").connect("pressed", self, "pause_done")
+	pause_menu.get_node("options_container/suspend_btn").connect("pressed", self, "suspend_battle")
 
 	# Initialize the battle scene
 	# For now this means, create a player and enemy party and set them in some
 	# default way.
-	player_party = party_class.new()	# Eventually this will come from external source
+	var base_char_data = {
+      "class": 0,
+      "name": "<default-name>",
+      "level": 1,
+      "experience": 0,
+      "health": 5,
+      "max_health": 5,
+      "energy": 5,
+      "max_energy": 25,
+      "energy_gain": 5,
+      "start_energy": 5,
+      "power": 4,
+      "skill": 3,
+      "expertise": 2
+    }
+	
+	var player_char_names = ["Darius", "Vergil", "Nero"]
+	player_party = party_class.new()	# Eventually this will be provided by the caller/prior stages
 	for i in range(3):
 		var state = character_state.new()
-		state.init(character_state.Classes.BASIC)
-		state.level_up()
+		
+		base_char_data["name"] = player_char_names[i]
+		state.init(base_char_data["class"], base_char_data)
 
 		player_party.add_character(state)
 
-	enemy_party = party_class.new()	# Eventually this will come from external source
+	var enemy_char_names = ["Balrog", "Caralyn", "Gandalf"]
+	enemy_party = party_class.new()	# Eventually this will be provided by the caller/prior stages
 	for i in range(3):
 		var state = character_state.new()
-		state.init(character_state.Classes.BASIC)
-		state.level_up()
+		
+		base_char_data["name"] = enemy_char_names[i]
+		state.init(base_char_data["class"], base_char_data)
 
 		enemy_party.add_character(state)
 
@@ -268,6 +301,53 @@ func finish_turn():
 
 	start_next_turn()
 	return
+
+func do_pause():
+	pause_btn.hide()
+	pause_menu.show()
+	get_tree().paused = true
+
+func pause_done():
+	pause_menu.hide()
+	pause_btn.show()
+	get_tree().paused = false
+
+func suspend_battle():
+	# TODO: Save off current battle state to a file, for now save off party state
+	var err = OK
+
+	var save_dir = Directory.new()
+	save_dir.make_dir_recursive("user://suspended_battle")
+
+	var player_save_file = File.new()
+	err = player_save_file.open("user://suspended_battle/player.json", File.WRITE_READ)
+	Utils.handle_error(player_save_file, err, true)
+
+	var player_party_info = {
+		"type" : "player",
+		"party" : player_party.get_character_dict()
+	}
+	
+	var player_json = JSON.print(player_party_info, "  ", false)
+	
+	player_save_file.store_line(player_json)
+	
+	player_save_file.close()
+	
+	var enemy_save_file = File.new()
+	err = enemy_save_file.open("user://suspended_battle/enemy.json", File.WRITE_READ)
+	Utils.handle_error(enemy_save_file, err, true)
+	
+	var enemy_party_info = {
+		"type" : "enemy",
+		"party" : enemy_party.get_character_dict()
+	}
+	
+	var enemy_json = JSON.print(enemy_party_info, "  ", false)
+	
+	enemy_save_file.store_line(enemy_json)
+
+	enemy_save_file.close()
 
 func _process(delta):
 	fps_label.text = "FPS: %s" % Engine.get_frames_per_second()

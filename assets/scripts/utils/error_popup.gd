@@ -7,6 +7,8 @@ var stack = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	self.pause_mode = Node.PAUSE_MODE_PROCESS
+
 	add_child(dialog)
 	dialog.dialog_hide_on_ok = true
 	dialog.get_label().valign = Label.VALIGN_CENTER

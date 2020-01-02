@@ -341,6 +341,17 @@ func set_from_save_data(data: Dictionary) -> bool:
 
 		return false
 
-	#print(data)
+	character_name = data["name"]
+	level = data["level"]
+	experience = data["experience"]
+	health = data["health"]
+	max_health = data["max_health"]
+	energy = data["energy"]
+	max_energy = data["max_energy"]
+	energy_gain = data["energy_gain"]
+	start_energy = data["start_energy"]
+	power = data["power"]
+	skill = data["skill"]
+	expertise = data["expertise"]
 
 	return true

@@ -39,7 +39,7 @@ func do_shrink():
 	emit_signal("shrink")
 
 func fill(c):
-	c_name.text = "Darius Detailed <TEMP>"
+	c_name.text = c.state.character_name
 	c_class.text = c.state.character_class_str
 	level.text = "Level %s" % c.state.level
 	experience.text = "Experience %s" % c.state.experience

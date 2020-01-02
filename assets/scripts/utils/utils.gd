@@ -41,5 +41,7 @@ static func handle_error(obj: Node, error, do_stack_dump: bool = false):
 	elif (error is String):
 		err_dlg = global_state.error_popup.new(error, stack)
 
-	if err_dlg != null:
+	if obj != null && err_dlg != null:
 		obj.add_child(err_dlg)
+	else:
+		Engine.get_main_loop().current_scene.add_child(err_dlg)
